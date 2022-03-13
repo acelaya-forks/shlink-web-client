@@ -1,4 +1,4 @@
-import { useState, useMemo, FC, useRef } from 'react';
+import { useState, useMemo, useRef, MutableRefObject } from 'react';
 import {
   Card,
   CardHeader,
@@ -166,6 +166,8 @@ const chartElementAtEvent = (
   }
 };
 
+type LineChartOrUndefined = Chart<'line'> | undefined;
+
 const LineChartCard = (
   { title, visits, highlightedVisits, highlightedLabel = 'Selected', setSelectedVisits }: LineChartCardProps,
 ) => {
@@ -173,6 +175,8 @@ const LineChartCard = (
     visits.length > 0 ? determineInitialStep(visits[visits.length - 1].date) : 'monthly',
   );
   const [ skipNoVisits, toggleSkipNoVisits ] = useToggle(true);
+  const ref1 = useRef<LineChartOrUndefined>();
+  const ref2 = useRef<LineChartOrUndefined>();
 
   const datasetsByPoint = useMemo(() => visitsToDatasetGroups(step, visits), [ step, visits ]);
   const groupedVisitsWithGaps = useMemo(() => groupVisitsByStep(step, reverse(visits)), [ step, visits ]);
@@ -221,24 +225,20 @@ const LineChartCard = (
     },
     onHover: pointerOnHover,
   };
-  const LineChart: FC = () => {
-    const ref = useRef<Chart<'line'> | undefined>();
+  const renderLineChart = (ref: MutableRefObject<LineChartOrUndefined>) => (
+    <Line
+      data={generateChartData() as any}
+      options={options as any}
+      ref={ref}
+      onClick={(e) => {
+        if (!ref.current) {
+          return;
+        }
 
-    return (
-      <Line
-        data={generateChartData() as any}
-        options={options as any}
-        ref={ref}
-        onClick={(e) => {
-          if (!ref.current) {
-            return;
-          }
-
-          chartElementAtEvent(labels, datasetsByPoint, getElementAtEvent(ref.current, e), setSelectedVisits);
-        }}
-      />
-    );
-  };
+        chartElementAtEvent(labels, datasetsByPoint, getElementAtEvent(ref.current, e), setSelectedVisits);
+      }}
+    />
+  );
 
   return (
     <Card>
@@ -267,8 +267,8 @@ const LineChartCard = (
       <CardBody className="line-chart-card__body">
         {/* It's VERY IMPORTANT to render two different components here, as one has 1 dataset and the other has 2 */}
         {/* Using the same component causes a crash when switching from 1 to 2 datasets, and then back to 1 dataset */}
-        {highlightedVisits.length > 0 && <LineChart />}
-        {highlightedVisits.length === 0 && <LineChart />}
+        {highlightedVisits.length > 0 && renderLineChart(ref1)}
+        {highlightedVisits.length === 0 && renderLineChart(ref2)}
       </CardBody>
     </Card>
   );
