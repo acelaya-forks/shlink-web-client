@@ -1,4 +1,4 @@
-import { useState, useMemo, FC } from 'react';
+import { useState, useMemo, FC, useRef } from 'react';
 import {
   Card,
   CardHeader,
@@ -8,7 +8,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from 'reactstrap';
-import { Line } from 'react-chartjs-2';
+import { getElementAtEvent, Line } from 'react-chartjs-2';
 import { always, cond, countBy, reverse } from 'ramda';
 import {
   add,
@@ -21,7 +21,7 @@ import {
   startOfISOWeek,
   endOfISOWeek,
 } from 'date-fns';
-import { ChartData, ChartDataset, ChartOptions } from 'chart.js';
+import { Chart, ChartData, ChartDataset, ChartOptions, InteractionItem } from 'chart.js';
 import { NormalizedVisit, Stats } from '../types';
 import { fillTheGaps } from '../../utils/helpers/visits';
 import { useToggle } from '../../utils/helpers/hooks';
@@ -148,8 +148,9 @@ let selectedLabel: string | null = null;
 const chartElementAtEvent = (
   labels: string[],
   datasetsByPoint: Record<string, NormalizedVisit[]>,
+  [ chart ]: InteractionItem[],
   setSelectedVisits?: (visits: NormalizedVisit[]) => void,
-) => ([ chart ]: [{ index: number }]) => {
+) => {
   if (!setSelectedVisits || !chart) {
     return;
   }
@@ -220,13 +221,24 @@ const LineChartCard = (
     },
     onHover: pointerOnHover,
   };
-  const LineChart: FC = () => (
-    <Line
-      data={generateChartData() as any}
-      options={options as any}
-      getElementAtEvent={chartElementAtEvent(labels, datasetsByPoint, setSelectedVisits) as any}
-    />
-  );
+  const LineChart: FC = () => {
+    const ref = useRef<Chart<'line'> | undefined>();
+
+    return (
+      <Line
+        data={generateChartData() as any}
+        options={options as any}
+        ref={ref}
+        onClick={(e) => {
+          if (!ref.current) {
+            return;
+          }
+
+          chartElementAtEvent(labels, datasetsByPoint, getElementAtEvent(ref.current, e), setSelectedVisits);
+        }}
+      />
+    );
+  };
 
   return (
     <Card>

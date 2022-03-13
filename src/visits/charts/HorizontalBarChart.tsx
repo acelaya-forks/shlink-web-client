@@ -1,7 +1,7 @@
-import { FC } from 'react';
-import { ChartData, ChartDataset, ChartOptions } from 'chart.js';
+import { FC, useRef } from 'react';
+import { Chart, ChartData, ChartDataset, ChartOptions, InteractionItem } from 'chart.js';
 import { keys, values } from 'ramda';
-import { Bar } from 'react-chartjs-2';
+import { Bar, getElementAtEvent } from 'react-chartjs-2';
 import { fillTheGaps } from '../../utils/helpers/visits';
 import { pointerOnHover, renderChartLabel } from '../../utils/helpers/charts';
 import { prettify } from '../../utils/helpers/numbers';
@@ -57,8 +57,7 @@ const generateChartData = (
   datasets: generateChartDatasets(data, highlightedData, highlightedLabel),
 });
 
-type ClickedCharts = [{ index: number }] | [];
-const chartElementAtEvent = (labels: string[], onClick?: (label: string) => void) => ([ chart ]: ClickedCharts) => {
+const chartElementAtEvent = (labels: string[], [ chart ]: InteractionItem[], onClick?: (label: string) => void) => {
   if (!onClick || !chart) {
     return;
   }
@@ -110,15 +109,20 @@ export const HorizontalBarChart: FC<HorizontalBarChartProps> = (
   const height = determineHeight(labels);
 
   // Provide a key based on the height, to force re-render every time the dataset changes (example, due to pagination)
-  const ChartComponent: FC<{ customKey: string }> = ({ customKey }) => (
-    <Bar
-      key={`${height}_${customKey}`}
-      data={chartData as any}
-      options={options as any}
-      height={height}
-      getElementAtEvent={chartElementAtEvent(labels, onClick) as any}
-    />
-  );
+  const ChartComponent: FC<{ customKey: string }> = ({ customKey }) => {
+    const ref = useRef<Chart<'bar'> | undefined>();
+
+    return (
+      <Bar
+        key={`${height}_${customKey}`}
+        data={chartData as any}
+        options={options as any}
+        height={height}
+        ref={ref}
+        onClick={(e) => ref.current && chartElementAtEvent(labels, getElementAtEvent(ref.current, e), onClick)}
+      />
+    );
+  };
 
   return (
     <>
