@@ -110,7 +110,7 @@ export const HorizontalBarChart: FC<HorizontalBarChartProps> = (
   const height = determineHeight(labels);
 
   // Provide a key based on the height, to force re-render every time the dataset changes (example, due to pagination)
-  const renderChartComponent = (customKey: string) => (
+  const ChartComponent: FC<{ customKey: string }> = ({ customKey }) => (
     <Bar
       key={`${height}_${customKey}`}
       data={chartData as any}
@@ -124,8 +124,8 @@ export const HorizontalBarChart: FC<HorizontalBarChartProps> = (
     <>
       {/* It's VERY IMPORTANT to render two different components here, as one has 1 dataset and the other has 2 */}
       {/* Using the same component causes a crash when switching from 1 to 2 datasets, and then back to 1 dataset */}
-      {highlightedStats !== undefined && renderChartComponent('with_stats')}
-      {highlightedStats === undefined && renderChartComponent('without_stats')}
+      {highlightedStats !== undefined && <ChartComponent customKey="with_stats" />}
+      {highlightedStats === undefined && <ChartComponent customKey="without_stats" />}
     </>
   );
 };
