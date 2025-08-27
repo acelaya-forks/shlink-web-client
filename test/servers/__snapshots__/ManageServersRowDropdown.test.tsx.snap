@@ -6,7 +6,7 @@ exports[`<ManageServersRowDropdown /> > renders expected size and icon 1`] = `
     class="relative inline-block"
   >
     <button
-      aria-controls="«r9»"
+      aria-controls="«r1h»"
       aria-expanded="false"
       aria-haspopup="true"
       aria-label="Options"
@@ -15,7 +15,7 @@ exports[`<ManageServersRowDropdown /> > renders expected size and icon 1`] = `
     >
       <svg
         aria-hidden="true"
-        class="svg-inline--fa fa-ellipsis-vertical fa-width-auto "
+        class="svg-inline--fa fa-ellipsis-vertical fa-width-auto"
         data-icon="ellipsis-vertical"
         data-prefix="fas"
         role="img"
@@ -41,7 +41,7 @@ exports[`<ManageServersRowDropdown /> > renders expected size and icon 2`] = `
     class="relative inline-block"
   >
     <button
-      aria-controls="«rb»"
+      aria-controls="«r1l»"
       aria-expanded="false"
       aria-haspopup="true"
       aria-label="Options"
@@ -50,7 +50,7 @@ exports[`<ManageServersRowDropdown /> > renders expected size and icon 2`] = `
     >
       <svg
         aria-hidden="true"
-        class="svg-inline--fa fa-ellipsis-vertical fa-width-auto "
+        class="svg-inline--fa fa-ellipsis-vertical fa-width-auto"
         data-icon="ellipsis-vertical"
         data-prefix="fas"
         role="img"
