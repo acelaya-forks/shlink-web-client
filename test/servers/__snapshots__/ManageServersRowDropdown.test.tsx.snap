@@ -6,7 +6,7 @@ exports[`<ManageServersRowDropdown /> > renders expected size and icon 1`] = `
     class="relative inline-block"
   >
     <button
-      aria-controls="«r1h»"
+      aria-controls="_r_1h_"
       aria-expanded="false"
       aria-haspopup="true"
       aria-label="Options"
@@ -41,7 +41,7 @@ exports[`<ManageServersRowDropdown /> > renders expected size and icon 2`] = `
     class="relative inline-block"
   >
     <button
-      aria-controls="«r1l»"
+      aria-controls="_r_1l_"
       aria-expanded="false"
       aria-haspopup="true"
       aria-label="Options"
