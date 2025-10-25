@@ -7,7 +7,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "lint": "eslint src test config/test",
+    "lint": "eslint src test config/test *.config.{js,ts}",
     "lint:fix": "node --run lint -- --fix",
     "types": "tsc",
     "start": "vite serve --host=0.0.0.0",

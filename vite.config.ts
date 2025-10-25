@@ -1,11 +1,11 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import { playwright } from '@vitest/browser-playwright';
 import { resolve } from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 import { manifest } from './manifest';
 import pack from './package.json' with { type: 'json' };
-import { playwright } from '@vitest/browser-playwright';
 
 const DEFAULT_NODE_VERSION = 'v22.10.0';
 const nodeVersion = process.version ?? DEFAULT_NODE_VERSION;
