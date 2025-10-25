@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 import { manifest } from './manifest';
 import pack from './package.json' with { type: 'json' };
+import { playwright } from '@vitest/browser-playwright';
 
 const DEFAULT_NODE_VERSION = 'v22.10.0';
 const nodeVersion = process.version ?? DEFAULT_NODE_VERSION;
@@ -40,7 +41,7 @@ export default defineConfig({
   test: {
     // Run tests in an actual browser
     browser: {
-      provider: 'playwright',
+      provider: playwright(),
       enabled: true,
       headless: true,
       screenshotFailures: false,
