@@ -18,9 +18,7 @@ const initialState: Settings = {
   realTimeUpdates: {
     enabled: true,
   },
-  shortUrlCreation: {
-    validateUrls: false,
-  },
+  shortUrlCreation: {},
   ui: {
     theme: getSystemPreferredTheme(),
   },

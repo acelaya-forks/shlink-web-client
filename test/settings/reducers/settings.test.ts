@@ -4,7 +4,7 @@ import { DEFAULT_SHORT_URLS_ORDERING, setSettings, settingsReducer } from '../..
 
 describe('settingsReducer', () => {
   const realTimeUpdates = { enabled: true };
-  const shortUrlCreation = { validateUrls: false };
+  const shortUrlCreation = {};
   const ui = { theme: 'light' as const };
   const visits = { defaultInterval: 'last30Days' as const };
   const shortUrlsList = { defaultOrdering: DEFAULT_SHORT_URLS_ORDERING };
