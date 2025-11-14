@@ -5,10 +5,13 @@ import type { FC } from 'react';
 import { useEffect, useRef } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import { AppUpdateBanner } from '../common/AppUpdateBanner';
+import { MainHeader } from '../common/MainHeader';
 import { NotFound } from '../common/NotFound';
+import { ShlinkVersionsContainer } from '../common/ShlinkVersionsContainer';
 import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
 import type { ServersMap } from '../servers/data';
+import { EditServer } from '../servers/EditServer';
 import { Settings } from '../settings/Settings';
 import { forceUpdate } from '../utils/helpers/sw';
 
@@ -21,26 +24,20 @@ type AppProps = {
 };
 
 type AppDeps = {
-  MainHeader: FC;
   Home: FC;
   ShlinkWebComponentContainer: FC;
   CreateServer: FC;
-  EditServer: FC;
   ManageServers: FC;
-  ShlinkVersionsContainer: FC;
 };
 
 const App: FCWithDeps<AppProps, AppDeps> = (
   { fetchServers, servers, settings, appUpdated, resetAppUpdate },
 ) => {
   const {
-    MainHeader,
     Home,
     ShlinkWebComponentContainer,
     CreateServer,
-    EditServer,
     ManageServers,
-    ShlinkVersionsContainer,
   } = useDependencies(App);
 
   const location = useLocation();
@@ -99,11 +96,8 @@ const App: FCWithDeps<AppProps, AppDeps> = (
 };
 
 export const AppFactory = componentFactory(App, [
-  'MainHeader',
   'Home',
   'ShlinkWebComponentContainer',
   'CreateServer',
-  'EditServer',
   'ManageServers',
-  'ShlinkVersionsContainer',
 ]);

@@ -3,16 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NavBar } from '@shlinkio/shlink-frontend-kit';
 import type { FC } from 'react';
 import { Link, useLocation } from 'react-router';
-import type { FCWithDeps } from '../container/utils';
-import { componentFactory, useDependencies } from '../container/utils';
+import { ServersDropdown } from '../servers/ServersDropdown';
 import { ShlinkLogo } from './img/ShlinkLogo';
 
-type MainHeaderDeps = {
-  ServersDropdown: FC;
-};
-
-const MainHeader: FCWithDeps<unknown, MainHeaderDeps> = () => {
-  const { ServersDropdown } = useDependencies(MainHeader);
+export const MainHeader: FC = () => {
   const { pathname } = useLocation();
 
   const settingsPath = '/settings';
@@ -37,5 +31,3 @@ const MainHeader: FCWithDeps<unknown, MainHeaderDeps> = () => {
     </NavBar>
   );
 };
-
-export const MainHeaderFactory = componentFactory(MainHeader, ['ServersDropdown']);

@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
+import { MemoryRouter } from 'react-router';
 import { ShlinkWebComponentContainerFactory } from '../../src/common/ShlinkWebComponentContainer';
 import type { NonReachableServer, NotFoundServer, SelectedServer } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
@@ -15,12 +16,13 @@ describe('<ShlinkWebComponentContainer />', () => {
   const ShlinkWebComponentContainer = ShlinkWebComponentContainerFactory(fromPartial({
     buildShlinkApiClient: vi.fn().mockReturnValue(fromPartial({})),
     TagColorsStorage: fromPartial({}),
-    ServerError: () => <>ServerError</>,
   }));
   const setUp = (selectedServer: SelectedServer) => renderWithStore(
-    <ShlinkWebComponentContainer settings={{}} />,
+    <MemoryRouter>
+      <ShlinkWebComponentContainer settings={{}} />
+    </MemoryRouter>,
     {
-      initialState: { selectedServer },
+      initialState: { selectedServer, servers: {} },
     },
   );
 
@@ -30,18 +32,20 @@ describe('<ShlinkWebComponentContainer />', () => {
     setUp(null);
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
-    expect(screen.queryByText('ServerError')).not.toBeInTheDocument();
     expect(screen.queryByText('ShlinkWebComponent')).not.toBeInTheDocument();
   });
 
   it.each([
-    [fromPartial<NotFoundServer>({ serverNotFound: true })],
-    [fromPartial<NonReachableServer>({ serverNotReachable: true })],
-  ])('shows error for non reachable servers', (selectedServer) => {
+    [fromPartial<NotFoundServer>({ serverNotFound: true }), 'Could not find this Shlink server.'],
+    [
+      fromPartial<NonReachableServer>({ id: 'foo', serverNotReachable: true }),
+      /Could not connect to this Shlink server/,
+    ],
+  ])('shows error for non reachable servers', (selectedServer, expectedError) => {
     setUp(selectedServer);
 
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    expect(screen.getByText('ServerError')).toBeInTheDocument();
+    expect(screen.getByText(expectedError)).toBeInTheDocument();
     expect(screen.queryByText('ShlinkWebComponent')).not.toBeInTheDocument();
   });
 
@@ -49,7 +53,6 @@ describe('<ShlinkWebComponentContainer />', () => {
     setUp(fromPartial({ version: '3.0.0' }));
 
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    expect(screen.queryByText('ServerError')).not.toBeInTheDocument();
     expect(screen.getByText('ShlinkWebComponent')).toBeInTheDocument();
   });
 });

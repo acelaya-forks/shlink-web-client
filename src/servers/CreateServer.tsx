@@ -7,18 +7,14 @@ import { NoMenuLayout } from '../common/NoMenuLayout';
 import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
 import { useGoBack } from '../utils/helpers/hooks';
-import type { ServerData, ServersMap, ServerWithId } from './data';
+import type { ServerData } from './data';
 import { ensureUniqueIds } from './helpers';
 import { DuplicatedServersModal } from './helpers/DuplicatedServersModal';
 import type { ImportServersBtnProps } from './helpers/ImportServersBtn';
 import { ServerForm } from './helpers/ServerForm';
+import { useServers } from './reducers/servers';
 
 const SHOW_IMPORT_MSG_TIME = 4000;
-
-type CreateServerProps = {
-  createServers: (servers: ServerWithId[]) => void;
-  servers: ServersMap;
-};
 
 type CreateServerDeps = {
   ImportServersBtn: FC<ImportServersBtnProps>;
@@ -34,7 +30,8 @@ const ImportResult = ({ variant }: Pick<ResultProps, 'variant'>) => (
   </div>
 );
 
-const CreateServer: FCWithDeps<CreateServerProps, CreateServerDeps> = ({ servers, createServers }) => {
+const CreateServer: FCWithDeps<any, CreateServerDeps> = () => {
+  const { servers, createServers } = useServers();
   const { ImportServersBtn, useTimeoutToggle } = useDependencies(CreateServer);
   const navigate = useNavigate();
   const goBack = useGoBack();

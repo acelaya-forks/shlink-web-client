@@ -19,10 +19,11 @@ export const renderWithStore = (
   element: ReactElement,
   { initialState = {}, ...options }: RenderOptionsWithState = {},
 ) => {
-  const Wrapper = ({ children }: PropsWithChildren) => (
-    <Provider store={setUpStore(initialState)}>
-      {children}
-    </Provider>
-  );
-  return renderWithEvents(element, { ...options, wrapper: Wrapper });
+  const store = setUpStore(initialState);
+  const Wrapper = ({ children }: PropsWithChildren) => <Provider store={store}>{children}</Provider>;
+
+  return {
+    store,
+    ...renderWithEvents(element, { ...options, wrapper: Wrapper }),
+  };
 };

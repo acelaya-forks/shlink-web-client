@@ -1,15 +1,19 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
 import { Home } from '../../src/common/Home';
 import type { ServersMap, ServerWithId } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<Home />', () => {
-  const setUp = (servers: ServersMap = {}) => render(
+  const setUp = (servers: ServersMap = {}) => renderWithStore(
     <MemoryRouter>
-      <Home servers={servers} />
+      <Home />
     </MemoryRouter>,
+    {
+      initialState: { servers },
+    },
   );
 
   it('passes a11y checks', () => checkAccessibility(

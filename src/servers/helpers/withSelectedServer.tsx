@@ -1,5 +1,4 @@
 import { Message } from '@shlinkio/shlink-frontend-kit';
-import type { FC } from 'react';
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
 import type { ShlinkApiClientBuilder } from '../../api/services/ShlinkApiClientBuilder';
@@ -8,9 +7,9 @@ import type { FCWithDeps } from '../../container/utils';
 import { useDependencies } from '../../container/utils';
 import { isNotFoundServer } from '../data';
 import { useSelectedServer } from '../reducers/selectedServer';
+import { ServerError } from './ServerError';
 
 export type WithSelectedServerPropsDeps = {
-  ServerError: FC;
   buildShlinkApiClient: ShlinkApiClientBuilder;
 };
 
@@ -18,7 +17,7 @@ export function withSelectedServer<T extends object>(
   WrappedComponent: FCWithDeps<T, WithSelectedServerPropsDeps>,
 ) {
   const ComponentWrapper: FCWithDeps<T, WithSelectedServerPropsDeps> = (props) => {
-    const { ServerError, buildShlinkApiClient } = useDependencies(ComponentWrapper);
+    const { buildShlinkApiClient } = useDependencies(ComponentWrapper);
     const params = useParams<{ serverId: string }>();
     const { selectServer, selectedServer } = useSelectedServer();
 

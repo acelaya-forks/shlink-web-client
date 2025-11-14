@@ -1,32 +1,33 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
 import type { ReachableServer, SelectedServer } from '../../src/servers/data';
-import { EditServerFactory } from '../../src/servers/EditServer';
+import { isServerWithId } from '../../src/servers/data';
+import { EditServer } from '../../src/servers/EditServer';
 import { checkAccessibility } from '../__helpers__/accessibility';
 import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<EditServer />', () => {
-  const ServerError = vi.fn();
-  const editServerMock = vi.fn();
   const defaultSelectedServer = fromPartial<ReachableServer>({
     id: 'abc123',
     name: 'the_name',
     url: 'the_url',
     apiKey: 'the_api_key',
   });
-  const EditServer = EditServerFactory(fromPartial({ ServerError }));
   const setUp = (selectedServer: SelectedServer = defaultSelectedServer) => {
     const history = createMemoryHistory({ initialEntries: ['/foo', '/bar'] });
     return {
       history,
       ...renderWithStore(
         <Router location={history.location} navigator={history}>
-          <EditServer editServer={editServerMock} />
+          <EditServer />
         </Router>,
         {
-          initialState: { selectedServer },
+          initialState: {
+            selectedServer,
+            servers: isServerWithId(selectedServer) ? { [selectedServer.id]: selectedServer } : {},
+          },
         },
       ),
     };
@@ -56,7 +57,7 @@ describe('<EditServer />', () => {
   });
 
   it('edits server and redirects to it when form is submitted', async () => {
-    const { user, history } = setUp();
+    const { user, history, store } = setUp();
 
     await user.type(screen.getByLabelText(/^Name/), ' edited');
     await user.type(screen.getByLabelText(/^URL/), ' edited');
@@ -64,12 +65,10 @@ describe('<EditServer />', () => {
     // await user.click(screen.getByRole('button', { name: 'Save' }));
     fireEvent.submit(screen.getByRole('form'));
 
-    expect(editServerMock).toHaveBeenCalledWith('abc123', {
+    expect(store.getState().servers[defaultSelectedServer.id]).toEqual(expect.objectContaining({
       name: 'the_name edited',
       url: 'the_url edited',
-      apiKey: 'the_api_key',
-      forwardCredentials: false,
-    });
+    }));
 
     // After saving we go back, to the first route from history's initialEntries
     expect(history.location.pathname).toEqual('/foo');
@@ -78,16 +77,15 @@ describe('<EditServer />', () => {
   it.each([
     { forwardCredentials: true },
     { forwardCredentials: false },
-  ])('edits advanced options - forward credentials', async (serverPartial) => {
-    const { user } = setUp({ ...defaultSelectedServer, ...serverPartial });
+  ])('edits advanced options - forward credentials', async ({ forwardCredentials }) => {
+    const { user, store } = setUp({ ...defaultSelectedServer, forwardCredentials });
 
     await user.click(screen.getByText('Advanced options'));
     await user.click(screen.getByLabelText('Forward credentials to this server on every request.'));
-
     fireEvent.submit(screen.getByRole('form'));
 
-    expect(editServerMock).toHaveBeenCalledWith('abc123', expect.objectContaining({
-      forwardCredentials: !serverPartial.forwardCredentials,
-    }));
+    await waitFor(() => expect(store.getState().servers[defaultSelectedServer.id]).toEqual(expect.objectContaining({
+      forwardCredentials: !forwardCredentials,
+    })));
   });
 });

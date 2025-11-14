@@ -15,11 +15,11 @@ describe('<ServersDropdown />', () => {
   const setUp = (servers: ServersMap = fallbackServers) => renderWithStore(
     <MemoryRouter>
       <ul role="menu">
-        <ServersDropdown servers={servers} />
+        <ServersDropdown />
       </ul>
     </MemoryRouter>,
     {
-      initialState: { selectedServer: null },
+      initialState: { selectedServer: null, servers },
     },
   );
 

@@ -3,22 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Table, Tooltip, useTooltip } from '@shlinkio/shlink-frontend-kit';
 import type { FC } from 'react';
 import { Link } from 'react-router';
-import type { FCWithDeps } from '../container/utils';
-import { componentFactory, useDependencies } from '../container/utils';
 import type { ServerWithId } from './data';
-import type { ManageServersRowDropdownProps } from './ManageServersRowDropdown';
+import { ManageServersRowDropdown } from './ManageServersRowDropdown';
 
 export type ManageServersRowProps = {
   server: ServerWithId;
   hasAutoConnect: boolean;
 };
 
-type ManageServersRowDeps = {
-  ManageServersRowDropdown: FC<ManageServersRowDropdownProps>;
-};
-
-const ManageServersRow: FCWithDeps<ManageServersRowProps, ManageServersRowDeps> = ({ server, hasAutoConnect }) => {
-  const { ManageServersRowDropdown } = useDependencies(ManageServersRow);
+export const ManageServersRow: FC<ManageServersRowProps> = ({ server, hasAutoConnect }) => {
   const { anchor, tooltip } = useTooltip();
 
   return (
@@ -31,6 +24,7 @@ const ManageServersRow: FCWithDeps<ManageServersRowProps, ManageServersRowDeps> 
                 icon={checkIcon}
                 className="text-lm-brand dark:text-dm-brand"
                 {...anchor}
+                data-testid="auto-connect"
               />
               <Tooltip {...tooltip}>Auto-connect to this server</Tooltip>
             </>
@@ -47,5 +41,3 @@ const ManageServersRow: FCWithDeps<ManageServersRowProps, ManageServersRowDeps> 
     </Table.Row>
   );
 };
-
-export const ManageServersRowFactory = componentFactory(ManageServersRow, ['ManageServersRowDropdown']);

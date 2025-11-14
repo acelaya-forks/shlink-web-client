@@ -9,6 +9,7 @@ import { memo } from 'react';
 import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
 import { isReachableServer } from '../servers/data';
+import { ServerError } from '../servers/helpers/ServerError';
 import type { WithSelectedServerPropsDeps } from '../servers/helpers/withSelectedServer';
 import { withSelectedServer } from '../servers/helpers/withSelectedServer';
 import { useSelectedServer } from '../servers/reducers/selectedServer';
@@ -33,7 +34,6 @@ const ShlinkWebComponentContainer: FCWithDeps<
   const {
     buildShlinkApiClient,
     TagColorsStorage: tagColorsStorage,
-    ServerError,
   } = useDependencies(ShlinkWebComponentContainer);
   const { selectedServer } = useSelectedServer();
 
@@ -63,5 +63,4 @@ const ShlinkWebComponentContainer: FCWithDeps<
 export const ShlinkWebComponentContainerFactory = componentFactory(ShlinkWebComponentContainer, [
   'buildShlinkApiClient',
   'TagColorsStorage',
-  'ServerError',
 ]);
