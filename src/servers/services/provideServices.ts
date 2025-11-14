@@ -11,7 +11,7 @@ import { ManageServersFactory } from '../ManageServers';
 import { ManageServersRowFactory } from '../ManageServersRow';
 import { ManageServersRowDropdownFactory } from '../ManageServersRowDropdown';
 import { fetchServers } from '../reducers/remoteServers';
-import { resetSelectedServer, selectServer } from '../reducers/selectedServer';
+import { selectServer } from '../reducers/selectedServer';
 import { createServers, deleteServer, editServer, setAutoConnect } from '../reducers/servers';
 import { ServersDropdown } from '../ServersDropdown';
 import { ServersExporter } from './ServersExporter';
@@ -21,7 +21,7 @@ export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
   // Components
   bottle.factory('ManageServers', ManageServersFactory);
   bottle.decorator('ManageServers', withoutSelectedServer);
-  bottle.decorator('ManageServers', connect(['selectedServer', 'servers'], ['resetSelectedServer']));
+  bottle.decorator('ManageServers', connect(['selectedServer', 'servers'], []));
 
   bottle.factory('ManageServersRow', ManageServersRowFactory);
 
@@ -30,10 +30,10 @@ export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
 
   bottle.factory('CreateServer', CreateServerFactory);
   bottle.decorator('CreateServer', withoutSelectedServer);
-  bottle.decorator('CreateServer', connect(['selectedServer', 'servers'], ['createServers', 'resetSelectedServer']));
+  bottle.decorator('CreateServer', connect(['selectedServer', 'servers'], ['createServers']));
 
   bottle.factory('EditServer', EditServerFactory);
-  bottle.decorator('EditServer', connect(['selectedServer'], ['editServer', 'selectServer', 'resetSelectedServer']));
+  bottle.decorator('EditServer', connect(['selectedServer'], ['editServer', 'selectServer']));
 
   bottle.serviceFactory('ServersDropdown', () => ServersDropdown);
   bottle.decorator('ServersDropdown', connect(['servers', 'selectedServer']));
@@ -60,6 +60,4 @@ export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
   bottle.serviceFactory('editServer', () => editServer);
   bottle.serviceFactory('setAutoConnect', () => setAutoConnect);
   bottle.serviceFactory('fetchServers', fetchServers, 'HttpClient');
-
-  bottle.serviceFactory('resetSelectedServer', () => resetSelectedServer);
 };

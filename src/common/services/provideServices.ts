@@ -23,7 +23,7 @@ export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
 
   bottle.serviceFactory('Home', () => Home);
   bottle.decorator('Home', withoutSelectedServer);
-  bottle.decorator('Home', connect(['servers'], ['resetSelectedServer']));
+  bottle.decorator('Home', connect(['servers'], []));
 
   bottle.factory('ShlinkWebComponentContainer', ShlinkWebComponentContainerFactory);
   bottle.decorator('ShlinkWebComponentContainer', connect(['selectedServer', 'settings'], ['selectServer']));

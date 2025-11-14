@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { useDispatch, useSelector } from 'react-redux';
 import type { RLSOptions } from 'redux-localstorage-simple';
 import { load, save } from 'redux-localstorage-simple';
 import { initReducers } from '../reducers';
 import { migrateDeprecatedSettings } from '../settings/helpers';
 import type { ShlinkState } from './types';
 
-const isProduction = process.env.NODE_ENV === 'production';
 const localStorageConfig: RLSOptions = {
   states: ['settings', 'servers'],
   namespace: 'shlink',
@@ -14,6 +14,7 @@ const localStorageConfig: RLSOptions = {
 };
 const getStateFromLocalStorage = () => migrateDeprecatedSettings(load(localStorageConfig) as ShlinkState);
 
+const isProduction = process.env.NODE_ENV === 'production';
 export const setUpStore = (preloadedState = getStateFromLocalStorage()) => configureStore({
   devTools: !isProduction,
   reducer: initReducers(),
@@ -22,3 +23,11 @@ export const setUpStore = (preloadedState = getStateFromLocalStorage()) => confi
     defaultMiddlewaresIncludingReduxThunk({ immutableCheck: false, serializableCheck: false }) // State is too big for these
       .concat(save(localStorageConfig)),
 });
+
+export type StoreType = ReturnType<typeof setUpStore>;
+export type AppDispatch = StoreType['dispatch'];
+export type RootState = ReturnType<StoreType['getState']>;
+
+// Typed versions of useDispatch() and useSelector()
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
+export const useAppSelector = useSelector.withTypes<RootState>();

@@ -1,7 +1,9 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { memoizeWith } from '@shlinkio/data-manipulation';
 import type { ShlinkHealth } from '@shlinkio/shlink-web-component/api-contract';
+import { useCallback } from 'react';
 import type { ShlinkApiClientBuilder } from '../../api/services/ShlinkApiClientBuilder';
+import { useAppDispatch, useAppSelector } from '../../container/store';
 import { createAsyncThunk } from '../../utils/helpers/redux';
 import { versionToPrintable, versionToSemVer as toSemVer } from '../../utils/helpers/version';
 import type { SelectedServer, ServerWithId } from '../data';
@@ -72,3 +74,19 @@ const { reducer } = createSlice({
 });
 
 export const selectedServerReducer = reducer;
+
+export const useSelectedServer = () => {
+  const dispatch = useAppDispatch();
+  const dispatchResetSelectedServer = useCallback(() => dispatch(resetSelectedServer()), [dispatch]);
+  const dispatchSelectServer = useCallback(
+    (options: SelectServerOptions) => dispatch(selectServer(options)),
+    [dispatch],
+  );
+  const selectedServer = useAppSelector(({ selectedServer }) => selectedServer);
+
+  return {
+    selectedServer,
+    resetSelectedServer: dispatchResetSelectedServer,
+    selectServer: dispatchSelectServer,
+  };
+};
