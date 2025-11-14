@@ -6,7 +6,7 @@ import {
   MAX_FALLBACK_VERSION,
   MIN_FALLBACK_VERSION,
   resetSelectedServer,
-  selectedServerReducerCreator,
+  selectedServerReducer as reducer,
   selectServer as selectServerCreator,
 } from '../../../src/servers/reducers/selectedServer';
 
@@ -15,7 +15,6 @@ describe('selectedServerReducer', () => {
   const health = vi.fn();
   const buildApiClient = vi.fn().mockReturnValue(fromPartial<ShlinkApiClient>({ health }));
   const selectServer = selectServerCreator(buildApiClient);
-  const { reducer } = selectedServerReducerCreator(selectServer);
 
   describe('reducer', () => {
     it('returns default when action is RESET_SELECTED_SERVER', () =>

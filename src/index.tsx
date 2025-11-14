@@ -7,7 +7,7 @@ import { setUpStore } from './container/store';
 import { register as registerServiceWorker } from './serviceWorkerRegistration';
 import './tailwind.css';
 
-const store = setUpStore(container);
+const store = setUpStore();
 const { App, ScrollToTop, ErrorHandler, appUpdateAvailable } = container;
 
 createRoot(document.getElementById('root')!).render(

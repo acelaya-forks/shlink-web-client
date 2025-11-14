@@ -5,7 +5,6 @@ import { provideServices as provideApiServices } from '../api/services/provideSe
 import { provideServices as provideAppServices } from '../app/services/provideServices';
 import { provideServices as provideCommonServices } from '../common/services/provideServices';
 import { provideServices as provideServersServices } from '../servers/services/provideServices';
-import { provideServices as provideSettingsServices } from '../settings/services/provideServices';
 import { provideServices as provideUtilsServices } from '../utils/services/provideServices';
 import type { ConnectDecorator } from './types';
 
@@ -39,4 +38,3 @@ provideCommonServices(bottle, connect);
 provideApiServices(bottle);
 provideServersServices(bottle, connect);
 provideUtilsServices(bottle);
-provideSettingsServices(bottle, connect);

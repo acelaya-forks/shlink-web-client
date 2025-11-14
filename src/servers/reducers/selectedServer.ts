@@ -56,14 +56,17 @@ export const selectServer = (buildShlinkApiClient: ShlinkApiClientBuilder) => cr
   },
 );
 
-type SelectServerThunk = ReturnType<typeof selectServer>;
-
-export const selectedServerReducerCreator = (selectServerThunk: SelectServerThunk) => createSlice({
+const { reducer } = createSlice({
   name: REDUCER_PREFIX,
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(resetSelectedServer, () => initialState);
-    builder.addCase(selectServerThunk.fulfilled, (_, { payload }) => payload as any);
+    builder.addCase(
+      `${REDUCER_PREFIX}/selectServer/fulfilled`,
+      (_, { payload }: { payload: SelectedServer }) => payload,
+    );
   },
 });
+
+export const selectedServerReducer = reducer;

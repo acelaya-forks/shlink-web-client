@@ -1,5 +1,5 @@
 import { changeThemeInMarkup, getSystemPreferredTheme } from '@shlinkio/shlink-frontend-kit';
-import type { Settings } from '@shlinkio/shlink-web-component/settings';
+import type { Settings as AppSettings } from '@shlinkio/shlink-web-component/settings';
 import { clsx } from 'clsx';
 import type { FC } from 'react';
 import { useEffect, useRef } from 'react';
@@ -9,12 +9,13 @@ import { NotFound } from '../common/NotFound';
 import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
 import type { ServersMap } from '../servers/data';
+import { Settings } from '../settings/Settings';
 import { forceUpdate } from '../utils/helpers/sw';
 
 type AppProps = {
   fetchServers: () => void;
   servers: ServersMap;
-  settings: Settings;
+  settings: AppSettings;
   resetAppUpdate: () => void;
   appUpdated: boolean;
 };
@@ -25,7 +26,6 @@ type AppDeps = {
   ShlinkWebComponentContainer: FC;
   CreateServer: FC;
   EditServer: FC;
-  Settings: FC;
   ManageServers: FC;
   ShlinkVersionsContainer: FC;
 };
@@ -39,7 +39,6 @@ const App: FCWithDeps<AppProps, AppDeps> = (
     ShlinkWebComponentContainer,
     CreateServer,
     EditServer,
-    Settings,
     ManageServers,
     ShlinkVersionsContainer,
   } = useDependencies(App);
@@ -105,7 +104,6 @@ export const AppFactory = componentFactory(App, [
   'ShlinkWebComponentContainer',
   'CreateServer',
   'EditServer',
-  'Settings',
   'ManageServers',
   'ShlinkVersionsContainer',
 ]);

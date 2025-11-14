@@ -11,11 +11,7 @@ import { ManageServersFactory } from '../ManageServers';
 import { ManageServersRowFactory } from '../ManageServersRow';
 import { ManageServersRowDropdownFactory } from '../ManageServersRowDropdown';
 import { fetchServers } from '../reducers/remoteServers';
-import {
-  resetSelectedServer,
-  selectedServerReducerCreator,
-  selectServer,
-} from '../reducers/selectedServer';
+import { resetSelectedServer, selectServer } from '../reducers/selectedServer';
 import { createServers, deleteServer, editServer, setAutoConnect } from '../reducers/servers';
 import { ServersDropdown } from '../ServersDropdown';
 import { ServersExporter } from './ServersExporter';
@@ -66,8 +62,4 @@ export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
   bottle.serviceFactory('fetchServers', fetchServers, 'HttpClient');
 
   bottle.serviceFactory('resetSelectedServer', () => resetSelectedServer);
-
-  // Reducers
-  bottle.serviceFactory('selectedServerReducerCreator', selectedServerReducerCreator, 'selectServer');
-  bottle.serviceFactory('selectedServerReducer', (obj) => obj.reducer, 'selectedServerReducerCreator');
 };
