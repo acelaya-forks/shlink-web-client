@@ -5,7 +5,7 @@ import { Router } from 'react-router';
 import type { ReachableServer, SelectedServer } from '../../src/servers/data';
 import { EditServerFactory } from '../../src/servers/EditServer';
 import { checkAccessibility } from '../__helpers__/accessibility';
-import { renderWithEvents } from '../__helpers__/setUpTest';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<EditServer />', () => {
   const ServerError = vi.fn();
@@ -21,10 +21,13 @@ describe('<EditServer />', () => {
     const history = createMemoryHistory({ initialEntries: ['/foo', '/bar'] });
     return {
       history,
-      ...renderWithEvents(
+      ...renderWithStore(
         <Router location={history.location} navigator={history}>
-          <EditServer editServer={editServerMock} selectedServer={selectedServer} selectServer={vi.fn()} />
+          <EditServer editServer={editServerMock} />
         </Router>,
+        {
+          initialState: { selectedServer },
+        },
       ),
     };
   };

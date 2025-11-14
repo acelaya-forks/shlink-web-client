@@ -4,22 +4,23 @@ import { Link } from 'react-router';
 import { NoMenuLayout } from '../../common/NoMenuLayout';
 import type { FCWithDeps } from '../../container/utils';
 import { componentFactory, useDependencies } from '../../container/utils';
-import type { SelectedServer, ServersMap } from '../data';
+import type { ServersMap } from '../data';
 import { isServerWithId } from '../data';
 import type { DeleteServerButtonProps } from '../DeleteServerButton';
+import { useSelectedServer } from '../reducers/selectedServer';
 import { ServersListGroup } from '../ServersListGroup';
 
 type ServerErrorProps = {
   servers: ServersMap;
-  selectedServer: SelectedServer;
 };
 
 type ServerErrorDeps = {
   DeleteServerButton: FC<DeleteServerButtonProps>;
 };
 
-const ServerError: FCWithDeps<ServerErrorProps, ServerErrorDeps> = ({ servers, selectedServer }) => {
+const ServerError: FCWithDeps<ServerErrorProps, ServerErrorDeps> = ({ servers }) => {
   const { DeleteServerButton } = useDependencies(ServerError);
+  const { selectedServer } = useSelectedServer();
 
   return (
     <NoMenuLayout>

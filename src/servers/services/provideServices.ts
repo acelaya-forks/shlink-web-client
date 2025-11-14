@@ -21,7 +21,7 @@ export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
   // Components
   bottle.factory('ManageServers', ManageServersFactory);
   bottle.decorator('ManageServers', withoutSelectedServer);
-  bottle.decorator('ManageServers', connect(['selectedServer', 'servers'], []));
+  bottle.decorator('ManageServers', connect(['servers'], []));
 
   bottle.factory('ManageServersRow', ManageServersRowFactory);
 
@@ -30,13 +30,13 @@ export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
 
   bottle.factory('CreateServer', CreateServerFactory);
   bottle.decorator('CreateServer', withoutSelectedServer);
-  bottle.decorator('CreateServer', connect(['selectedServer', 'servers'], ['createServers']));
+  bottle.decorator('CreateServer', connect(['servers'], ['createServers']));
 
   bottle.factory('EditServer', EditServerFactory);
-  bottle.decorator('EditServer', connect(['selectedServer'], ['editServer', 'selectServer']));
+  bottle.decorator('EditServer', connect([], ['editServer', 'selectServer']));
 
   bottle.serviceFactory('ServersDropdown', () => ServersDropdown);
-  bottle.decorator('ServersDropdown', connect(['servers', 'selectedServer']));
+  bottle.decorator('ServersDropdown', connect(['servers']));
 
   bottle.serviceFactory('DeleteServerModal', () => DeleteServerModal);
   bottle.decorator('DeleteServerModal', connect(null, ['deleteServer']));
@@ -47,7 +47,7 @@ export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
   bottle.decorator('ImportServersBtn', connect(['servers'], ['createServers']));
 
   bottle.factory('ServerError', ServerErrorFactory);
-  bottle.decorator('ServerError', connect(['servers', 'selectedServer']));
+  bottle.decorator('ServerError', connect(['servers']));
 
   // Services
   bottle.service('ServersImporter', ServersImporter, 'csvToJson');

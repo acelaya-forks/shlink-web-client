@@ -6,14 +6,8 @@ import type { ShlinkApiClientBuilder } from '../../api/services/ShlinkApiClientB
 import { NoMenuLayout } from '../../common/NoMenuLayout';
 import type { FCWithDeps } from '../../container/utils';
 import { useDependencies } from '../../container/utils';
-import type { SelectedServer } from '../data';
 import { isNotFoundServer } from '../data';
-import type { SelectServerOptions } from '../reducers/selectedServer';
-
-export type WithSelectedServerProps = {
-  selectServer: (options: SelectServerOptions) => void;
-  selectedServer: SelectedServer;
-};
+import { useSelectedServer } from '../reducers/selectedServer';
 
 export type WithSelectedServerPropsDeps = {
   ServerError: FC;
@@ -21,12 +15,12 @@ export type WithSelectedServerPropsDeps = {
 };
 
 export function withSelectedServer<T extends object>(
-  WrappedComponent: FCWithDeps<WithSelectedServerProps & T, WithSelectedServerPropsDeps>,
+  WrappedComponent: FCWithDeps<T, WithSelectedServerPropsDeps>,
 ) {
-  const ComponentWrapper: FCWithDeps<WithSelectedServerProps & T, WithSelectedServerPropsDeps> = (props) => {
+  const ComponentWrapper: FCWithDeps<T, WithSelectedServerPropsDeps> = (props) => {
     const { ServerError, buildShlinkApiClient } = useDependencies(ComponentWrapper);
     const params = useParams<{ serverId: string }>();
-    const { selectServer, selectedServer } = props;
+    const { selectServer, selectedServer } = useSelectedServer();
 
     useEffect(() => {
       if (params.serverId) {

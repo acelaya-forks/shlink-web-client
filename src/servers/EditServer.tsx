@@ -6,17 +6,17 @@ import { useGoBack } from '../utils/helpers/hooks';
 import type { ServerData } from './data';
 import { isServerWithId } from './data';
 import { ServerForm } from './helpers/ServerForm';
-import type { WithSelectedServerProps, WithSelectedServerPropsDeps } from './helpers/withSelectedServer';
+import type { WithSelectedServerPropsDeps } from './helpers/withSelectedServer';
 import { withSelectedServer } from './helpers/withSelectedServer';
+import { useSelectedServer } from './reducers/selectedServer';
 
-type EditServerProps = WithSelectedServerProps & {
+type EditServerProps = {
   editServer: (serverId: string, serverData: ServerData) => void;
 };
 
-const EditServer: FCWithDeps<EditServerProps, WithSelectedServerPropsDeps> = withSelectedServer((
-  { editServer, selectedServer, selectServer },
-) => {
+const EditServer: FCWithDeps<EditServerProps, WithSelectedServerPropsDeps> = withSelectedServer(({ editServer }) => {
   const { buildShlinkApiClient } = useDependencies(EditServer);
+  const { selectServer, selectedServer } = useSelectedServer();
   const goBack = useGoBack();
   const { reconnect } = useParsedQuery<{ reconnect?: 'true' }>();
 

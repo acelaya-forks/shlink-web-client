@@ -1,16 +1,20 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
 import type { NonReachableServer, NotFoundServer, SelectedServer } from '../../../src/servers/data';
 import { ServerErrorFactory } from '../../../src/servers/helpers/ServerError';
 import { checkAccessibility } from '../../__helpers__/accessibility';
+import { renderWithStore } from '../../__helpers__/setUpTest';
 
 describe('<ServerError />', () => {
   const ServerError = ServerErrorFactory(fromPartial({ DeleteServerButton: () => null }));
-  const setUp = (selectedServer: SelectedServer) => render(
+  const setUp = (selectedServer: SelectedServer) => renderWithStore(
     <MemoryRouter>
-      <ServerError servers={{}} selectedServer={selectedServer} />
+      <ServerError servers={{}} />
     </MemoryRouter>,
+    {
+      initialState: { selectedServer },
+    },
   );
 
   it.each([

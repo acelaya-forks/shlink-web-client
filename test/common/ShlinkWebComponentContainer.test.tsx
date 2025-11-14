@@ -1,9 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { ShlinkWebComponentContainerFactory } from '../../src/common/ShlinkWebComponentContainer';
 import type { NonReachableServer, NotFoundServer, SelectedServer } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
-import { MemoryRouterWithParams } from '../__helpers__/MemoryRouterWithParams';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 vi.mock('@shlinkio/shlink-web-component', () => ({
   ShlinkSidebarVisibilityProvider: ({ children }: any) => children,
@@ -17,10 +17,11 @@ describe('<ShlinkWebComponentContainer />', () => {
     TagColorsStorage: fromPartial({}),
     ServerError: () => <>ServerError</>,
   }));
-  const setUp = (selectedServer: SelectedServer) => render(
-    <MemoryRouterWithParams params={{ serverId: 'abc123' }}>
-      <ShlinkWebComponentContainer selectServer={vi.fn()} selectedServer={selectedServer} settings={{}} />
-    </MemoryRouterWithParams>,
+  const setUp = (selectedServer: SelectedServer) => renderWithStore(
+    <ShlinkWebComponentContainer settings={{}} />,
+    {
+      initialState: { selectedServer },
+    },
   );
 
   it('passes a11y checks', () => checkAccessibility(setUp(fromPartial({ version: '3.0.0' }))));

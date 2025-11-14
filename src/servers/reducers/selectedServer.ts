@@ -63,7 +63,7 @@ export const selectServer = createAsyncThunk(
   },
 );
 
-const { reducer } = createSlice({
+export const { reducer: selectedServerReducer } = createSlice({
   name: REDUCER_PREFIX,
   initialState: initialState as SelectedServer,
   reducers: {},
@@ -72,8 +72,6 @@ const { reducer } = createSlice({
     builder.addCase(selectServer.fulfilled, (_, { payload }) => payload);
   },
 });
-
-export const selectedServerReducer = reducer;
 
 export const useSelectedServer = () => {
   const dispatch = useAppDispatch();

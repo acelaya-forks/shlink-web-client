@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router';
 import type { ServersMap } from '../../src/servers/data';
 import { ServersDropdown } from '../../src/servers/ServersDropdown';
 import { checkAccessibility } from '../__helpers__/accessibility';
-import { renderWithEvents } from '../__helpers__/setUpTest';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<ServersDropdown />', () => {
   const fallbackServers: ServersMap = {
@@ -12,12 +12,15 @@ describe('<ServersDropdown />', () => {
     '2b': fromPartial({ name: 'bar', id: '2b' }),
     '3c': fromPartial({ name: 'baz', id: '3c' }),
   };
-  const setUp = (servers: ServersMap = fallbackServers) => renderWithEvents(
+  const setUp = (servers: ServersMap = fallbackServers) => renderWithStore(
     <MemoryRouter>
       <ul role="menu">
-        <ServersDropdown servers={servers} selectedServer={null} />
+        <ServersDropdown servers={servers} />
       </ul>
     </MemoryRouter>,
+    {
+      initialState: { selectedServer: null },
+    },
   );
 
   it('passes a11y checks', async () => {

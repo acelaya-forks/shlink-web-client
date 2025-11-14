@@ -9,11 +9,12 @@ import { memo } from 'react';
 import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
 import { isReachableServer } from '../servers/data';
-import type { WithSelectedServerProps, WithSelectedServerPropsDeps } from '../servers/helpers/withSelectedServer';
+import type { WithSelectedServerPropsDeps } from '../servers/helpers/withSelectedServer';
 import { withSelectedServer } from '../servers/helpers/withSelectedServer';
+import { useSelectedServer } from '../servers/reducers/selectedServer';
 import { NotFound } from './NotFound';
 
-type ShlinkWebComponentContainerProps = WithSelectedServerProps & {
+type ShlinkWebComponentContainerProps = {
   settings: Settings;
 };
 
@@ -28,12 +29,13 @@ const ShlinkWebComponentContainer: FCWithDeps<
 //       memo is probably not the right solution. The root cause is the withSelectedServer HOC, but I couldn't fix the
 //       extra rendering there.
 //       This should be revisited at some point.
-> = withSelectedServer(memo(({ selectedServer, settings }) => {
+> = withSelectedServer(memo(({ settings }) => {
   const {
     buildShlinkApiClient,
     TagColorsStorage: tagColorsStorage,
     ServerError,
   } = useDependencies(ShlinkWebComponentContainer);
+  const { selectedServer } = useSelectedServer();
 
   if (!isReachableServer(selectedServer)) {
     return <ServerError />;
