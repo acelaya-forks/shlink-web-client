@@ -1,6 +1,5 @@
 import type { ShlinkApiClient } from '@shlinkio/shlink-js-sdk';
 import { fromPartial } from '@total-typescript/shoehorn';
-import type { ShlinkState } from '../../../src/container/types';
 import type { NonReachableServer, NotFoundServer, RegularServer } from '../../../src/servers/data';
 import {
   MAX_FALLBACK_VERSION,
@@ -9,6 +8,7 @@ import {
   selectedServerReducer as reducer,
   selectServer,
 } from '../../../src/servers/reducers/selectedServer';
+import type { RootState } from '../../../src/store';
 
 describe('selectedServerReducer', () => {
   const dispatch = vi.fn();
@@ -71,7 +71,7 @@ describe('selectedServerReducer', () => {
 
     it('dispatches error when server is not found', async () => {
       const id = crypto.randomUUID();
-      const getState = vi.fn(() => fromPartial<ShlinkState>({ servers: {} }));
+      const getState = vi.fn(() => fromPartial<RootState>({ servers: {} }));
       const expectedSelectedServer: NotFoundServer = { serverNotFound: true };
 
       await selectServer({ serverId: id, buildShlinkApiClient })(dispatch, getState, {});

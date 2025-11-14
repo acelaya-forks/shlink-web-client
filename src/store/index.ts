@@ -24,7 +24,8 @@ export const setUpStore = (preloadedState = getStateFromLocalStorage()) => confi
 
 export type StoreType = ReturnType<typeof setUpStore>;
 export type AppDispatch = StoreType['dispatch'];
-export type RootState = ReturnType<StoreType['getState']>;
+export type GetState = StoreType['getState'];
+export type RootState = ReturnType<GetState>;
 
 // Typed versions of useDispatch() and useSelector()
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();

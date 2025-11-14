@@ -1,6 +1,6 @@
 import type { HttpClient } from '@shlinkio/shlink-js-sdk';
 import pack from '../../../package.json';
-import { createAsyncThunk } from '../../utils/helpers/redux';
+import { createAsyncThunk } from '../../store/helpers';
 import { hasServerData } from '../data';
 import { ensureUniqueIds } from '../helpers';
 import { createServers } from './servers';

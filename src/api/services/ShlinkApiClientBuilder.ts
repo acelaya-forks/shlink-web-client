@@ -1,8 +1,8 @@
 import type { HttpClient } from '@shlinkio/shlink-js-sdk';
 import { ShlinkApiClient } from '@shlinkio/shlink-js-sdk';
-import type { GetState } from '../../container/types';
 import type { ServerWithId } from '../../servers/data';
 import { hasServerData } from '../../servers/data';
+import type { GetState } from '../../store';
 
 const apiClients: Map<string, ShlinkApiClient> = new Map();
 

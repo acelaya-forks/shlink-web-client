@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { PropsWithChildren, ReactElement } from 'react';
 import { Provider } from 'react-redux';
-import type { ShlinkState } from '../../src/container/types';
+import type { RootState } from '../../src/store';
 import { setUpStore } from '../../src/store';
 
 export const renderWithEvents = (element: ReactElement, options?: RenderOptions) => ({
@@ -12,7 +12,7 @@ export const renderWithEvents = (element: ReactElement, options?: RenderOptions)
 });
 
 export type RenderOptionsWithState = Omit<RenderOptions, 'wrapper'> & {
-  initialState?: Partial<ShlinkState>;
+  initialState?: Partial<RootState>;
 };
 
 export const renderWithStore = (
