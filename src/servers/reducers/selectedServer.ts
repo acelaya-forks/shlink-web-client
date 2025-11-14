@@ -3,7 +3,7 @@ import { memoizeWith } from '@shlinkio/data-manipulation';
 import type { ShlinkHealth } from '@shlinkio/shlink-web-component/api-contract';
 import { useCallback } from 'react';
 import type { ShlinkApiClientBuilder } from '../../api/services/ShlinkApiClientBuilder';
-import { useAppDispatch, useAppSelector } from '../../container/store';
+import { useAppDispatch, useAppSelector } from '../../store';
 import { createAsyncThunk } from '../../utils/helpers/redux';
 import { versionToPrintable, versionToSemVer as toSemVer } from '../../utils/helpers/version';
 import type { SelectedServer, ServerWithId } from '../data';

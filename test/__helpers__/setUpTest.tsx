@@ -3,8 +3,8 @@ import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { PropsWithChildren, ReactElement } from 'react';
 import { Provider } from 'react-redux';
-import { setUpStore } from '../../src/container/store';
 import type { ShlinkState } from '../../src/container/types';
+import { setUpStore } from '../../src/store';
 
 export const renderWithEvents = (element: ReactElement, options?: RenderOptions) => ({
   user: userEvent.setup(),

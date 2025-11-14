@@ -2,9 +2,9 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RLSOptions } from 'redux-localstorage-simple';
 import { load, save } from 'redux-localstorage-simple';
-import { initReducers } from '../reducers';
+import type { ShlinkState } from '../container/types';
 import { migrateDeprecatedSettings } from '../settings/helpers';
-import type { ShlinkState } from './types';
+import { initReducers } from './reducers';
 
 const localStorageConfig: RLSOptions = {
   states: ['settings', 'servers'],

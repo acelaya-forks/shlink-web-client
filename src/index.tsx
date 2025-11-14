@@ -3,8 +3,8 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router';
 import pack from '../package.json';
 import { container } from './container';
-import { setUpStore } from './container/store';
 import { register as registerServiceWorker } from './serviceWorkerRegistration';
+import { setUpStore } from './store';
 import './tailwind.css';
 
 const store = setUpStore();
