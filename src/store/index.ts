@@ -2,7 +2,6 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RLSOptions } from 'redux-localstorage-simple';
 import { load, save } from 'redux-localstorage-simple';
-import type { ShlinkState } from '../container/types';
 import { migrateDeprecatedSettings } from '../settings/helpers';
 import { initReducers } from './reducers';
 
@@ -12,7 +11,7 @@ const localStorageConfig: RLSOptions = {
   namespaceSeparator: '.',
   debounce: 300,
 };
-const getStateFromLocalStorage = () => migrateDeprecatedSettings(load(localStorageConfig) as ShlinkState);
+const getStateFromLocalStorage = () => migrateDeprecatedSettings(load(localStorageConfig));
 
 const isProduction = process.env.NODE_ENV === 'production';
 export const setUpStore = (preloadedState = getStateFromLocalStorage()) => configureStore({
@@ -20,8 +19,7 @@ export const setUpStore = (preloadedState = getStateFromLocalStorage()) => confi
   reducer: initReducers(),
   preloadedState,
   middleware: (defaultMiddlewaresIncludingReduxThunk) =>
-    defaultMiddlewaresIncludingReduxThunk({ immutableCheck: false, serializableCheck: false }) // State is too big for these
-      .concat(save(localStorageConfig)),
+    defaultMiddlewaresIncludingReduxThunk().concat(save(localStorageConfig)),
 });
 
 export type StoreType = ReturnType<typeof setUpStore>;
