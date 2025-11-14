@@ -1,3 +1,4 @@
+import type { HttpClient } from '@shlinkio/shlink-js-sdk';
 import { act, screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
@@ -13,17 +14,12 @@ describe('<App />', () => {
       ShlinkWebComponentContainer: () => <>ShlinkWebComponentContainer</>,
       CreateServer: () => <>CreateServer</>,
       ManageServers: () => <>ManageServers</>,
+      HttpClient: fromPartial<HttpClient>({}),
     }),
   );
   const setUp = async (activeRoute = '/') => act(() => renderWithStore(
     <MemoryRouter initialEntries={[{ pathname: activeRoute }]}>
-      <App
-        fetchServers={() => {}}
-        servers={{}}
-        settings={fromPartial({})}
-        appUpdated={false}
-        resetAppUpdate={() => {}}
-      />
+      <App settings={fromPartial({})} appUpdated={false} resetAppUpdate={() => {}} />
     </MemoryRouter>,
     {
       initialState: {

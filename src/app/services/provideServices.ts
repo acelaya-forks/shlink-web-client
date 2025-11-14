@@ -6,7 +6,7 @@ import { appUpdateAvailable, resetAppUpdate } from '../reducers/appUpdates';
 export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
   // Components
   bottle.factory('App', AppFactory);
-  bottle.decorator('App', connect(['servers', 'settings', 'appUpdated'], ['fetchServers', 'resetAppUpdate']));
+  bottle.decorator('App', connect(['settings', 'appUpdated'], ['resetAppUpdate']));
 
   // Actions
   bottle.serviceFactory('appUpdateAvailable', () => appUpdateAvailable);

@@ -3,7 +3,6 @@ import { CreateServerFactory } from '../CreateServer';
 import { ImportServersBtnFactory } from '../helpers/ImportServersBtn';
 import { withoutSelectedServer } from '../helpers/withoutSelectedServer';
 import { ManageServersFactory } from '../ManageServers';
-import { fetchServers } from '../reducers/remoteServers';
 import { ServersExporter } from './ServersExporter';
 import { ServersImporter } from './ServersImporter';
 
@@ -20,7 +19,4 @@ export const provideServices = (bottle: Bottle) => {
   // Services
   bottle.service('ServersImporter', ServersImporter, 'csvToJson');
   bottle.service('ServersExporter', ServersExporter, 'Storage', 'window', 'jsonToCsv');
-
-  // Actions
-  bottle.serviceFactory('fetchServers', fetchServers, 'HttpClient');
 };

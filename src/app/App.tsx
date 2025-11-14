@@ -1,8 +1,9 @@
 import { changeThemeInMarkup, getSystemPreferredTheme } from '@shlinkio/shlink-frontend-kit';
+import type { HttpClient } from '@shlinkio/shlink-js-sdk';
 import type { Settings as AppSettings } from '@shlinkio/shlink-web-component/settings';
 import { clsx } from 'clsx';
 import type { FC } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import { AppUpdateBanner } from '../common/AppUpdateBanner';
 import { MainHeader } from '../common/MainHeader';
@@ -10,14 +11,12 @@ import { NotFound } from '../common/NotFound';
 import { ShlinkVersionsContainer } from '../common/ShlinkVersionsContainer';
 import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
-import type { ServersMap } from '../servers/data';
 import { EditServer } from '../servers/EditServer';
+import { useLoadRemoteServers } from '../servers/reducers/remoteServers';
 import { Settings } from '../settings/Settings';
 import { forceUpdate } from '../utils/helpers/sw';
 
-type AppProps = {
-  fetchServers: () => void;
-  servers: ServersMap;
+export type AppProps = {
   settings: AppSettings;
   resetAppUpdate: () => void;
   appUpdated: boolean;
@@ -28,29 +27,22 @@ type AppDeps = {
   ShlinkWebComponentContainer: FC;
   CreateServer: FC;
   ManageServers: FC;
+  HttpClient: HttpClient;
 };
 
-const App: FCWithDeps<AppProps, AppDeps> = (
-  { fetchServers, servers, settings, appUpdated, resetAppUpdate },
-) => {
+const App: FCWithDeps<AppProps, AppDeps> = ({ settings, appUpdated, resetAppUpdate }) => {
   const {
     Home,
     ShlinkWebComponentContainer,
     CreateServer,
     ManageServers,
+    HttpClient: httpClient,
   } = useDependencies(App);
 
-  const location = useLocation();
-  const initialServers = useRef(servers);
-  const isHome = location.pathname === '/';
+  useLoadRemoteServers(httpClient);
 
-  useEffect(() => {
-    // Try to fetch the remote servers if the list is empty during first render.
-    // We use a ref because we don't care if the servers list becomes empty later.
-    if (Object.keys(initialServers.current).length === 0) {
-      fetchServers();
-    }
-  }, [fetchServers]);
+  const location = useLocation();
+  const isHome = location.pathname === '/';
 
   useEffect(() => {
     changeThemeInMarkup(settings.ui?.theme ?? getSystemPreferredTheme());
@@ -100,4 +92,5 @@ export const AppFactory = componentFactory(App, [
   'ShlinkWebComponentContainer',
   'CreateServer',
   'ManageServers',
+  'HttpClient',
 ]);
