@@ -29,9 +29,14 @@ const initialState: SelectedServer = null;
 
 export const resetSelectedServer = createAction<void>(`${REDUCER_PREFIX}/resetSelectedServer`);
 
-export const selectServer = (buildShlinkApiClient: ShlinkApiClientBuilder) => createAsyncThunk(
+export type SelectServerOptions = {
+  serverId: string;
+  buildShlinkApiClient: ShlinkApiClientBuilder;
+};
+
+export const selectServer = createAsyncThunk(
   `${REDUCER_PREFIX}/selectServer`,
-  async (serverId: string, { dispatch, getState }): Promise<SelectedServer> => {
+  async ({ serverId, buildShlinkApiClient }: SelectServerOptions, { dispatch, getState }): Promise<SelectedServer> => {
     dispatch(resetSelectedServer());
 
     const { servers } = getState();
@@ -58,14 +63,11 @@ export const selectServer = (buildShlinkApiClient: ShlinkApiClientBuilder) => cr
 
 const { reducer } = createSlice({
   name: REDUCER_PREFIX,
-  initialState,
+  initialState: initialState as SelectedServer,
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(resetSelectedServer, () => initialState);
-    builder.addCase(
-      `${REDUCER_PREFIX}/selectServer/fulfilled`,
-      (_, { payload }: { payload: SelectedServer }) => payload,
-    );
+    builder.addCase(selectServer.fulfilled, (_, { payload }) => payload);
   },
 });
 

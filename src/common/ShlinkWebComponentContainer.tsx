@@ -5,13 +5,11 @@ import {
   ShlinkWebComponent,
 } from '@shlinkio/shlink-web-component';
 import type { Settings } from '@shlinkio/shlink-web-component/settings';
-import type { FC } from 'react';
 import { memo } from 'react';
-import type { ShlinkApiClientBuilder } from '../api/services/ShlinkApiClientBuilder';
 import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
 import { isReachableServer } from '../servers/data';
-import type { WithSelectedServerProps } from '../servers/helpers/withSelectedServer';
+import type { WithSelectedServerProps, WithSelectedServerPropsDeps } from '../servers/helpers/withSelectedServer';
 import { withSelectedServer } from '../servers/helpers/withSelectedServer';
 import { NotFound } from './NotFound';
 
@@ -19,10 +17,8 @@ type ShlinkWebComponentContainerProps = WithSelectedServerProps & {
   settings: Settings;
 };
 
-type ShlinkWebComponentContainerDeps = {
-  buildShlinkApiClient: ShlinkApiClientBuilder,
+type ShlinkWebComponentContainerDeps = WithSelectedServerPropsDeps & {
   TagColorsStorage: TagColorsStorage,
-  ServerError: FC,
 };
 
 const ShlinkWebComponentContainer: FCWithDeps<

@@ -1,26 +1,22 @@
-import { Button,useParsedQuery  } from '@shlinkio/shlink-frontend-kit';
-import type { FC } from 'react';
+import { Button, useParsedQuery } from '@shlinkio/shlink-frontend-kit';
 import { NoMenuLayout } from '../common/NoMenuLayout';
 import type { FCWithDeps } from '../container/utils';
-import { componentFactory } from '../container/utils';
+import { componentFactory, useDependencies } from '../container/utils';
 import { useGoBack } from '../utils/helpers/hooks';
 import type { ServerData } from './data';
 import { isServerWithId } from './data';
 import { ServerForm } from './helpers/ServerForm';
-import type { WithSelectedServerProps } from './helpers/withSelectedServer';
+import type { WithSelectedServerProps, WithSelectedServerPropsDeps } from './helpers/withSelectedServer';
 import { withSelectedServer } from './helpers/withSelectedServer';
 
 type EditServerProps = WithSelectedServerProps & {
   editServer: (serverId: string, serverData: ServerData) => void;
 };
 
-type EditServerDeps = {
-  ServerError: FC;
-};
-
-const EditServer: FCWithDeps<EditServerProps, EditServerDeps> = withSelectedServer((
+const EditServer: FCWithDeps<EditServerProps, WithSelectedServerPropsDeps> = withSelectedServer((
   { editServer, selectedServer, selectServer },
 ) => {
+  const { buildShlinkApiClient } = useDependencies(EditServer);
   const goBack = useGoBack();
   const { reconnect } = useParsedQuery<{ reconnect?: 'true' }>();
 
@@ -31,7 +27,7 @@ const EditServer: FCWithDeps<EditServerProps, EditServerDeps> = withSelectedServ
   const handleSubmit = (serverData: ServerData) => {
     editServer(selectedServer.id, serverData);
     if (reconnect === 'true') {
-      selectServer(selectedServer.id);
+      selectServer({ serverId: selectedServer.id, buildShlinkApiClient });
     }
     goBack();
   };

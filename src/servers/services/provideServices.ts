@@ -54,7 +54,7 @@ export const provideServices = (bottle: Bottle, connect: ConnectDecorator) => {
   bottle.service('ServersExporter', ServersExporter, 'Storage', 'window', 'jsonToCsv');
 
   // Actions
-  bottle.serviceFactory('selectServer', selectServer, 'buildShlinkApiClient', 'loadMercureInfo');
+  bottle.serviceFactory('selectServer', () => selectServer, 'buildShlinkApiClient', 'loadMercureInfo');
   bottle.serviceFactory('createServers', () => createServers);
   bottle.serviceFactory('deleteServer', () => deleteServer);
   bottle.serviceFactory('editServer', () => editServer);
