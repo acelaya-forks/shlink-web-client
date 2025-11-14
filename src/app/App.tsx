@@ -1,6 +1,5 @@
 import { changeThemeInMarkup, getSystemPreferredTheme } from '@shlinkio/shlink-frontend-kit';
 import type { HttpClient } from '@shlinkio/shlink-js-sdk';
-import type { Settings as AppSettings } from '@shlinkio/shlink-web-component/settings';
 import { clsx } from 'clsx';
 import type { FC } from 'react';
 import { useEffect } from 'react';
@@ -13,11 +12,11 @@ import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
 import { EditServer } from '../servers/EditServer';
 import { useLoadRemoteServers } from '../servers/reducers/remoteServers';
+import { useSettings } from '../settings/reducers/settings';
 import { Settings } from '../settings/Settings';
 import { forceUpdate } from '../utils/helpers/sw';
 
 export type AppProps = {
-  settings: AppSettings;
   resetAppUpdate: () => void;
   appUpdated: boolean;
 };
@@ -30,7 +29,7 @@ type AppDeps = {
   HttpClient: HttpClient;
 };
 
-const App: FCWithDeps<AppProps, AppDeps> = ({ settings, appUpdated, resetAppUpdate }) => {
+const App: FCWithDeps<AppProps, AppDeps> = ({ appUpdated, resetAppUpdate }) => {
   const {
     Home,
     ShlinkWebComponentContainer,
@@ -44,6 +43,7 @@ const App: FCWithDeps<AppProps, AppDeps> = ({ settings, appUpdated, resetAppUpda
   const location = useLocation();
   const isHome = location.pathname === '/';
 
+  const { settings } = useSettings();
   useEffect(() => {
     changeThemeInMarkup(settings.ui?.theme ?? getSystemPreferredTheme());
   }, [settings.ui?.theme]);

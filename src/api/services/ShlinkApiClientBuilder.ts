@@ -6,8 +6,6 @@ import type { GetState } from '../../store';
 
 const apiClients: Map<string, ShlinkApiClient> = new Map();
 
-const isGetState = (getStateOrSelectedServer: GetState | ServerWithId): getStateOrSelectedServer is GetState =>
-  typeof getStateOrSelectedServer === 'function';
 const getSelectedServerFromState = (getState: GetState): ServerWithId => {
   const { selectedServer } = getState();
   if (!hasServerData(selectedServer)) {
@@ -18,7 +16,7 @@ const getSelectedServerFromState = (getState: GetState): ServerWithId => {
 };
 
 export const buildShlinkApiClient = (httpClient: HttpClient) => (getStateOrSelectedServer: GetState | ServerWithId) => {
-  const { url: baseUrl, apiKey, forwardCredentials } = isGetState(getStateOrSelectedServer)
+  const { url: baseUrl, apiKey, forwardCredentials } = typeof getStateOrSelectedServer === 'function'
     ? getSelectedServerFromState(getStateOrSelectedServer)
     : getStateOrSelectedServer;
   const serverKey = `${apiKey}_${baseUrl}_${forwardCredentials ? 'forward' : 'no-forward'}`;
@@ -34,6 +32,7 @@ export const buildShlinkApiClient = (httpClient: HttpClient) => (getStateOrSelec
     { requestCredentials: forwardCredentials ? 'include' : undefined },
   );
   apiClients.set(serverKey, apiClient);
+
   return apiClient;
 };
 

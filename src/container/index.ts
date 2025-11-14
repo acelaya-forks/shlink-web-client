@@ -34,7 +34,7 @@ const connect: ConnectDecorator = (propsFromState: string[] | null, actionServic
   );
 
 provideAppServices(bottle, connect);
-provideCommonServices(bottle, connect);
+provideCommonServices(bottle);
 provideApiServices(bottle);
 provideServersServices(bottle);
 provideUtilsServices(bottle);

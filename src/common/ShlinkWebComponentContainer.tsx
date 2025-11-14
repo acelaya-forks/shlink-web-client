@@ -4,7 +4,6 @@ import {
   ShlinkSidebarVisibilityProvider,
   ShlinkWebComponent,
 } from '@shlinkio/shlink-web-component';
-import type { Settings } from '@shlinkio/shlink-web-component/settings';
 import { memo } from 'react';
 import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
@@ -13,29 +12,27 @@ import { ServerError } from '../servers/helpers/ServerError';
 import type { WithSelectedServerPropsDeps } from '../servers/helpers/withSelectedServer';
 import { withSelectedServer } from '../servers/helpers/withSelectedServer';
 import { useSelectedServer } from '../servers/reducers/selectedServer';
+import { useSettings } from '../settings/reducers/settings';
 import { NotFound } from './NotFound';
-
-type ShlinkWebComponentContainerProps = {
-  settings: Settings;
-};
 
 type ShlinkWebComponentContainerDeps = WithSelectedServerPropsDeps & {
   TagColorsStorage: TagColorsStorage,
 };
 
 const ShlinkWebComponentContainer: FCWithDeps<
-  ShlinkWebComponentContainerProps,
+  any,
   ShlinkWebComponentContainerDeps
 // FIXME Using `memo` here to solve a flickering effect in charts.
 //       memo is probably not the right solution. The root cause is the withSelectedServer HOC, but I couldn't fix the
 //       extra rendering there.
 //       This should be revisited at some point.
-> = withSelectedServer(memo(({ settings }) => {
+> = withSelectedServer(memo(() => {
   const {
     buildShlinkApiClient,
     TagColorsStorage: tagColorsStorage,
   } = useDependencies(ShlinkWebComponentContainer);
   const { selectedServer } = useSelectedServer();
+  const { settings } = useSettings();
 
   if (!isReachableServer(selectedServer)) {
     return <ServerError />;

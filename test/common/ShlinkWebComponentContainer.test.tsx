@@ -19,10 +19,10 @@ describe('<ShlinkWebComponentContainer />', () => {
   }));
   const setUp = (selectedServer: SelectedServer) => renderWithStore(
     <MemoryRouter>
-      <ShlinkWebComponentContainer settings={{}} />
+      <ShlinkWebComponentContainer />
     </MemoryRouter>,
     {
-      initialState: { selectedServer, servers: {} },
+      initialState: { selectedServer, servers: {}, settings: {} },
     },
   );
 

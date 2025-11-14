@@ -19,7 +19,7 @@ describe('<App />', () => {
   );
   const setUp = async (activeRoute = '/') => act(() => renderWithStore(
     <MemoryRouter initialEntries={[{ pathname: activeRoute }]}>
-      <App settings={fromPartial({})} appUpdated={false} resetAppUpdate={() => {}} />
+      <App appUpdated={false} resetAppUpdate={() => {}} />
     </MemoryRouter>,
     {
       initialState: {
@@ -27,6 +27,7 @@ describe('<App />', () => {
           abc123: fromPartial<ServerWithId>({ id: 'abc123', name: 'abc123 server' }),
           def456: fromPartial<ServerWithId>({ id: 'def456', name: 'def456 server' }),
         },
+        settings: fromPartial({}),
       },
     },
   ));
