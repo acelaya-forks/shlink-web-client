@@ -1,10 +1,9 @@
 import { faFileUpload as importIcon } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Tooltip, useToggle , useTooltip } from '@shlinkio/shlink-frontend-kit';
-import type { ChangeEvent, PropsWithChildren } from 'react';
+import { Button, Tooltip, useToggle, useTooltip } from '@shlinkio/shlink-frontend-kit';
+import type { ChangeEvent, FC, PropsWithChildren } from 'react';
 import { useCallback, useRef, useState } from 'react';
-import type { FCWithDeps } from '../../container/utils';
-import { componentFactory, useDependencies } from '../../container/utils';
+import { withDependencies } from '../../container/context';
 import type { ServerData } from '../data';
 import { useServers } from '../reducers/servers';
 import type { ServersImporter } from '../services/ServersImporter';
@@ -16,21 +15,20 @@ export type ImportServersBtnProps = PropsWithChildren<{
   onError?: (error: Error) => void;
   tooltipPlacement?: 'top' | 'bottom';
   className?: string;
+
+  // Injected
+  ServersImporter: ServersImporter
 }>;
 
-type ImportServersBtnDeps = {
-  ServersImporter: ServersImporter
-};
-
-const ImportServersBtn: FCWithDeps<ImportServersBtnProps, ImportServersBtnDeps> = ({
+const ImportServersBtnBase: FC<ImportServersBtnProps> = ({
   children,
   onImport,
   onError = () => {},
   tooltipPlacement = 'bottom',
   className = '',
+  ServersImporter: serversImporter,
 }) => {
   const { createServers, servers } = useServers();
-  const { ServersImporter: serversImporter } = useDependencies(ImportServersBtn);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { anchor, tooltip } = useTooltip({ placement: tooltipPlacement });
   const [duplicatedServers, setDuplicatedServers] = useState<ServerData[]>([]);
@@ -106,4 +104,4 @@ const ImportServersBtn: FCWithDeps<ImportServersBtnProps, ImportServersBtnDeps> 
   );
 };
 
-export const ImportServersBtnFactory = componentFactory(ImportServersBtn, ['ServersImporter']);
+export const ImportServersBtn = withDependencies(ImportServersBtnBase, ['ServersImporter']);

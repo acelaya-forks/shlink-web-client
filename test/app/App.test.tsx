@@ -2,25 +2,25 @@ import type { HttpClient } from '@shlinkio/shlink-js-sdk';
 import { act, screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
-import { AppFactory } from '../../src/app/App';
+import { App } from '../../src/app/App';
 import { ContainerProvider } from '../../src/container/context';
 import type { ServerWithId } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
 import { renderWithStore } from '../__helpers__/setUpTest';
 
+vi.mock(import('../../src/common/ShlinkWebComponentContainer'), () => ({
+  ShlinkWebComponentContainer: () => <span>ShlinkWebComponentContainer</span>,
+}));
+
 describe('<App />', () => {
-  const App = AppFactory(
-    fromPartial({
-      Home: () => <>Home</>,
-      ShlinkWebComponentContainer: () => <>ShlinkWebComponentContainer</>,
-      CreateServer: () => <>CreateServer</>,
-      ManageServers: () => <>ManageServers</>,
-    }),
-  );
   const setUp = async (activeRoute = '/') => act(() => renderWithStore(
     <MemoryRouter initialEntries={[{ pathname: activeRoute }]}>
       <ContainerProvider
-        value={fromPartial({ HttpClient: fromPartial<HttpClient>({}), buildShlinkApiClient: vi.fn() })}
+        value={fromPartial({
+          HttpClient: fromPartial<HttpClient>({}),
+          buildShlinkApiClient: vi.fn(),
+          useTimeoutToggle: vi.fn().mockReturnValue([false, vi.fn()]),
+        })}
       >
         <App />
       </ContainerProvider>
@@ -42,8 +42,8 @@ describe('<App />', () => {
   it.each([
     ['/settings/general', 'User interface'],
     ['/settings/short-urls', 'Short URLs form'],
-    ['/manage-servers', 'ManageServers'],
-    ['/server/create', 'CreateServer'],
+    ['/manage-servers', 'Add a server'],
+    ['/server/create', 'Add new server'],
     ['/server/abc123/edit', 'Edit "abc123 server"'],
     ['/server/def456/edit', 'Edit "def456 server"'],
     ['/server/abc123/foo', 'ShlinkWebComponentContainer'],

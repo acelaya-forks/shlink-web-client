@@ -5,27 +5,24 @@ import { Button, Result, SearchInput, SimpleCard, Table } from '@shlinkio/shlink
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 import { NoMenuLayout } from '../common/NoMenuLayout';
-import type { FCWithDeps } from '../container/utils';
-import { componentFactory, useDependencies } from '../container/utils';
-import type { ImportServersBtnProps } from './helpers/ImportServersBtn';
+import { withDependencies } from '../container/context';
+import { ImportServersBtn } from './helpers/ImportServersBtn';
+import { withoutSelectedServer } from './helpers/withoutSelectedServer';
 import { ManageServersRow } from './ManageServersRow';
 import { useServers } from './reducers/servers';
 import type { ServersExporter } from './services/ServersExporter';
 
-type ManageServersDeps = {
+export type ManageServersProps = {
   ServersExporter: ServersExporter;
-  ImportServersBtn: FC<ImportServersBtnProps>;
   useTimeoutToggle: TimeoutToggle;
 };
 
 const SHOW_IMPORT_MSG_TIME = 4000;
 
-const ManageServers: FCWithDeps<unknown, ManageServersDeps> = () => {
-  const {
-    ServersExporter: serversExporter,
-    ImportServersBtn,
-    useTimeoutToggle,
-  } = useDependencies(ManageServers);
+const ManageServersBase: FC<ManageServersProps> = withoutSelectedServer(({
+  ServersExporter: serversExporter,
+  useTimeoutToggle,
+}) => {
   const { servers } = useServers();
   const [searchTerm, setSearchTerm] = useState('');
   const allServers = useMemo(() => Object.values(servers), [servers]);
@@ -34,7 +31,7 @@ const ManageServers: FCWithDeps<unknown, ManageServersDeps> = () => {
     [allServers, searchTerm],
   );
   const hasAutoConnect = allServers.some(({ autoConnect }) => !!autoConnect);
-  // eslint-disable-next-line react-compiler/react-compiler
+
   const [errorImporting, setErrorImporting] = useTimeoutToggle({ delay: SHOW_IMPORT_MSG_TIME });
 
   return (
@@ -82,10 +79,6 @@ const ManageServers: FCWithDeps<unknown, ManageServersDeps> = () => {
       )}
     </NoMenuLayout>
   );
-};
+});
 
-export const ManageServersFactory = componentFactory(ManageServers, [
-  'ServersExporter',
-  'ImportServersBtn',
-  'useTimeoutToggle',
-]);
+export const ManageServers = withDependencies(ManageServersBase, ['ServersExporter', 'useTimeoutToggle']);

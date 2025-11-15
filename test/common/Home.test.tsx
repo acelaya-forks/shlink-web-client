@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
 import { Home } from '../../src/common/Home';
+import { ContainerProvider } from '../../src/container/context';
 import type { ServersMap, ServerWithId } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
 import { renderWithStore } from '../__helpers__/setUpTest';
@@ -9,7 +10,9 @@ import { renderWithStore } from '../__helpers__/setUpTest';
 describe('<Home />', () => {
   const setUp = (servers: ServersMap = {}) => renderWithStore(
     <MemoryRouter>
-      <Home />
+      <ContainerProvider value={fromPartial({ buildShlinkApiClient: vi.fn() })}>
+        <Home />
+      </ContainerProvider>
     </MemoryRouter>,
     {
       initialState: { servers },
