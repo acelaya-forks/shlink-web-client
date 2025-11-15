@@ -1,5 +1,4 @@
 import { changeThemeInMarkup, getSystemPreferredTheme } from '@shlinkio/shlink-frontend-kit';
-import type { HttpClient } from '@shlinkio/shlink-js-sdk';
 import { clsx } from 'clsx';
 import type { FC } from 'react';
 import { useEffect } from 'react';
@@ -26,7 +25,6 @@ type AppDeps = {
   ShlinkWebComponentContainer: FC;
   CreateServer: FC;
   ManageServers: FC;
-  HttpClient: HttpClient;
 };
 
 const App: FCWithDeps<AppProps, AppDeps> = ({ appUpdated, resetAppUpdate }) => {
@@ -35,10 +33,9 @@ const App: FCWithDeps<AppProps, AppDeps> = ({ appUpdated, resetAppUpdate }) => {
     ShlinkWebComponentContainer,
     CreateServer,
     ManageServers,
-    HttpClient: httpClient,
   } = useDependencies(App);
 
-  useLoadRemoteServers(httpClient);
+  useLoadRemoteServers();
 
   const location = useLocation();
   const isHome = location.pathname === '/';
@@ -92,5 +89,4 @@ export const AppFactory = componentFactory(App, [
   'ShlinkWebComponentContainer',
   'CreateServer',
   'ManageServers',
-  'HttpClient',
 ]);

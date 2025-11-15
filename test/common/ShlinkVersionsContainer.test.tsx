@@ -1,12 +1,15 @@
 import { fromPartial } from '@total-typescript/shoehorn';
 import { ShlinkVersionsContainer } from '../../src/common/ShlinkVersionsContainer';
+import { ContainerProvider } from '../../src/container/context';
 import type { ReachableServer, SelectedServer } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
 import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<ShlinkVersionsContainer />', () => {
   const setUp = (selectedServer: SelectedServer = null) => renderWithStore(
-    <ShlinkVersionsContainer />,
+    <ContainerProvider value={fromPartial({ buildShlinkApiClient: vi.fn() })}>
+      <ShlinkVersionsContainer />
+    </ContainerProvider>,
     {
       initialState: { selectedServer },
     },

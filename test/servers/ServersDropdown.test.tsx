@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
+import { ContainerProvider } from '../../src/container/context';
 import type { ServersMap } from '../../src/servers/data';
 import { ServersDropdown } from '../../src/servers/ServersDropdown';
 import { checkAccessibility } from '../__helpers__/accessibility';
@@ -14,9 +15,11 @@ describe('<ServersDropdown />', () => {
   };
   const setUp = (servers: ServersMap = fallbackServers) => renderWithStore(
     <MemoryRouter>
-      <ul role="menu">
-        <ServersDropdown />
-      </ul>
+      <ContainerProvider value={fromPartial({ buildShlinkApiClient: vi.fn() })}>
+        <ul role="menu">
+          <ServersDropdown />
+        </ul>
+      </ContainerProvider>
     </MemoryRouter>,
     {
       initialState: { selectedServer: null, servers },

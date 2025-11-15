@@ -3,6 +3,7 @@ import { act, screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
 import { AppFactory } from '../../src/app/App';
+import { ContainerProvider } from '../../src/container/context';
 import type { ServerWithId } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
 import { renderWithStore } from '../__helpers__/setUpTest';
@@ -14,12 +15,15 @@ describe('<App />', () => {
       ShlinkWebComponentContainer: () => <>ShlinkWebComponentContainer</>,
       CreateServer: () => <>CreateServer</>,
       ManageServers: () => <>ManageServers</>,
-      HttpClient: fromPartial<HttpClient>({}),
     }),
   );
   const setUp = async (activeRoute = '/') => act(() => renderWithStore(
     <MemoryRouter initialEntries={[{ pathname: activeRoute }]}>
-      <App appUpdated={false} resetAppUpdate={() => {}} />
+      <ContainerProvider
+        value={fromPartial({ HttpClient: fromPartial<HttpClient>({}), buildShlinkApiClient: vi.fn() })}
+      >
+        <App appUpdated={false} resetAppUpdate={() => {}} />
+      </ContainerProvider>
     </MemoryRouter>,
     {
       initialState: {

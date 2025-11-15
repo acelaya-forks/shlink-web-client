@@ -1,6 +1,7 @@
 import type { HttpClient } from '@shlinkio/shlink-js-sdk';
 import { useCallback, useEffect, useRef } from 'react';
 import pack from '../../../package.json';
+import { useDependencies } from '../../container/context';
 import { useAppDispatch } from '../../store';
 import { createAsyncThunk } from '../../store/helpers';
 import { hasServerData } from '../data';
@@ -24,12 +25,13 @@ export const fetchServers = createAsyncThunk(
 
 export const useRemoteServers = () => {
   const dispatch = useAppDispatch();
-  const dispatchFetchServer = useCallback((httpClient: HttpClient) => dispatch(fetchServers(httpClient)), [dispatch]);
+  const [httpClient] = useDependencies<[HttpClient]>('HttpClient');
+  const dispatchFetchServer = useCallback(() => dispatch(fetchServers(httpClient)), [dispatch, httpClient]);
 
   return { fetchServers: dispatchFetchServer };
 };
 
-export const useLoadRemoteServers = (httpClient: HttpClient) => {
+export const useLoadRemoteServers = () => {
   const { fetchServers } = useRemoteServers();
   const { servers } = useServers();
   const initialServers = useRef(servers);
@@ -38,7 +40,7 @@ export const useLoadRemoteServers = (httpClient: HttpClient) => {
     // Try to fetch the remote servers if the list is empty during first render.
     // We use a ref because we don't care if the servers list becomes empty later.
     if (Object.keys(initialServers.current).length === 0) {
-      fetchServers(httpClient);
+      fetchServers();
     }
-  }, [fetchServers, httpClient]);
+  }, [fetchServers]);
 };

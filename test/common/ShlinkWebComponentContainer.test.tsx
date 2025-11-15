@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
 import { ShlinkWebComponentContainerFactory } from '../../src/common/ShlinkWebComponentContainer';
+import { ContainerProvider } from '../../src/container/context';
 import type { NonReachableServer, NotFoundServer, SelectedServer } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
 import { renderWithStore } from '../__helpers__/setUpTest';
@@ -19,7 +20,9 @@ describe('<ShlinkWebComponentContainer />', () => {
   }));
   const setUp = (selectedServer: SelectedServer) => renderWithStore(
     <MemoryRouter>
-      <ShlinkWebComponentContainer />
+      <ContainerProvider value={fromPartial({ buildShlinkApiClient: vi.fn() })}>
+        <ShlinkWebComponentContainer />
+      </ContainerProvider>
     </MemoryRouter>,
     {
       initialState: { selectedServer, servers: {}, settings: {} },
