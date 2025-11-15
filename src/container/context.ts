@@ -8,7 +8,7 @@ export const ContainerProvider = ContainerContext.Provider;
 export const useDependencies = <T extends unknown[]>(...names: string[]): T => {
   const container = useContext(ContainerContext);
   if (!container) {
-    throw new Error('You cannot use "useDependency" outside of a ContainerProvider');
+    throw new Error('You cannot use "useDependencies" outside of a ContainerProvider');
   }
 
   return names.map((name) => {
