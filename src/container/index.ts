@@ -1,42 +1,32 @@
-import type { IContainer } from 'bottlejs';
+import { useTimeoutToggle } from '@shlinkio/shlink-frontend-kit';
+import { FetchHttpClient } from '@shlinkio/shlink-js-sdk/fetch';
 import Bottle from 'bottlejs';
-import { connect as reduxConnect } from 'react-redux';
-import { provideServices as provideApiServices } from '../api/services/provideServices';
-import { provideServices as provideAppServices } from '../app/services/provideServices';
-import { provideServices as provideCommonServices } from '../common/services/provideServices';
-import { provideServices as provideServersServices } from '../servers/services/provideServices';
-import { provideServices as provideSettingsServices } from '../settings/services/provideServices';
-import { provideServices as provideUtilsServices } from '../utils/services/provideServices';
-import type { ConnectDecorator } from './types';
-
-type LazyActionMap = Record<string, (...args: unknown[]) => unknown>;
+import { buildShlinkApiClient } from '../api/services/ShlinkApiClientBuilder';
+import { ServersExporter } from '../servers/services/ServersExporter';
+import { ServersImporter } from '../servers/services/ServersImporter';
+import { csvToJson, jsonToCsv } from '../utils/helpers/csvjson';
+import { LocalStorage } from '../utils/services/LocalStorage';
+import { TagColorsStorage } from '../utils/services/TagColorsStorage';
 
 const bottle = new Bottle();
 
 export const { container } = bottle;
 
-const lazyService = <T extends (...args: unknown[]) => unknown, K>(cont: IContainer, serviceName: string) =>
-  (...args: any[]) => (cont[serviceName] as T)(...args) as K;
+bottle.constant('window', window);
+bottle.constant('console', console);
+bottle.constant('fetch', window.fetch.bind(window));
+bottle.service('HttpClient', FetchHttpClient, 'fetch');
 
-const mapActionService = (map: LazyActionMap, actionName: string): LazyActionMap => ({
-  ...map,
-  // Wrap actual action service in a function so that it is lazily created the first time it is called
-  [actionName]: lazyService(container, actionName),
-});
+bottle.constant('localStorage', window.localStorage);
+bottle.service('Storage', LocalStorage, 'localStorage');
+bottle.service('TagColorsStorage', TagColorsStorage, 'Storage');
 
-const pickProps = (propsToPick: string[]) => (obj: any) => Object.fromEntries(
-  propsToPick.map((key) => [key, obj[key]]),
-);
+bottle.constant('csvToJson', csvToJson);
+bottle.constant('jsonToCsv', jsonToCsv);
 
-const connect: ConnectDecorator = (propsFromState: string[] | null, actionServiceNames: string[] = []) =>
-  reduxConnect(
-    propsFromState ? pickProps(propsFromState) : null,
-    actionServiceNames.reduce(mapActionService, {}),
-  );
+bottle.serviceFactory('useTimeoutToggle', () => useTimeoutToggle);
 
-provideAppServices(bottle, connect);
-provideCommonServices(bottle, connect);
-provideApiServices(bottle);
-provideServersServices(bottle, connect);
-provideUtilsServices(bottle);
-provideSettingsServices(bottle, connect);
+bottle.serviceFactory('buildShlinkApiClient', buildShlinkApiClient, 'HttpClient');
+
+bottle.service('ServersImporter', ServersImporter, 'csvToJson');
+bottle.service('ServersExporter', ServersExporter, 'Storage', 'window', 'jsonToCsv');

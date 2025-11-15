@@ -1,61 +1,32 @@
 import { changeThemeInMarkup, getSystemPreferredTheme } from '@shlinkio/shlink-frontend-kit';
-import type { Settings } from '@shlinkio/shlink-web-component/settings';
 import { clsx } from 'clsx';
 import type { FC } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import { AppUpdateBanner } from '../common/AppUpdateBanner';
+import { Home } from '../common/Home';
+import { MainHeader } from '../common/MainHeader';
 import { NotFound } from '../common/NotFound';
-import type { FCWithDeps } from '../container/utils';
-import { componentFactory, useDependencies } from '../container/utils';
-import type { ServersMap } from '../servers/data';
+import { ShlinkVersionsContainer } from '../common/ShlinkVersionsContainer';
+import { ShlinkWebComponentContainer } from '../common/ShlinkWebComponentContainer';
+import { CreateServer } from '../servers/CreateServer';
+import { EditServer } from '../servers/EditServer';
+import { ManageServers } from '../servers/ManageServers';
+import { useLoadRemoteServers } from '../servers/reducers/remoteServers';
+import { useSettings } from '../settings/reducers/settings';
+import { Settings } from '../settings/Settings';
 import { forceUpdate } from '../utils/helpers/sw';
+import { useAppUpdated } from './reducers/appUpdates';
 
-type AppProps = {
-  fetchServers: () => void;
-  servers: ServersMap;
-  settings: Settings;
-  resetAppUpdate: () => void;
-  appUpdated: boolean;
-};
+export const App: FC = () => {
+  const { appUpdated, resetAppUpdate } = useAppUpdated();
 
-type AppDeps = {
-  MainHeader: FC;
-  Home: FC;
-  ShlinkWebComponentContainer: FC;
-  CreateServer: FC;
-  EditServer: FC;
-  Settings: FC;
-  ManageServers: FC;
-  ShlinkVersionsContainer: FC;
-};
-
-const App: FCWithDeps<AppProps, AppDeps> = (
-  { fetchServers, servers, settings, appUpdated, resetAppUpdate },
-) => {
-  const {
-    MainHeader,
-    Home,
-    ShlinkWebComponentContainer,
-    CreateServer,
-    EditServer,
-    Settings,
-    ManageServers,
-    ShlinkVersionsContainer,
-  } = useDependencies(App);
+  useLoadRemoteServers();
 
   const location = useLocation();
-  const initialServers = useRef(servers);
   const isHome = location.pathname === '/';
 
-  useEffect(() => {
-    // Try to fetch the remote servers if the list is empty during first render.
-    // We use a ref because we don't care if the servers list becomes empty later.
-    if (Object.keys(initialServers.current).length === 0) {
-      fetchServers();
-    }
-  }, [fetchServers]);
-
+  const { settings } = useSettings();
   useEffect(() => {
     changeThemeInMarkup(settings.ui?.theme ?? getSystemPreferredTheme());
   }, [settings.ui?.theme]);
@@ -98,14 +69,3 @@ const App: FCWithDeps<AppProps, AppDeps> = (
     </div>
   );
 };
-
-export const AppFactory = componentFactory(App, [
-  'MainHeader',
-  'Home',
-  'ShlinkWebComponentContainer',
-  'CreateServer',
-  'EditServer',
-  'Settings',
-  'ManageServers',
-  'ShlinkVersionsContainer',
-]);

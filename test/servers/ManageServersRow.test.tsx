@@ -1,22 +1,19 @@
 import { Table } from '@shlinkio/shlink-frontend-kit';
-import { render, screen } from '@testing-library/react';
-import { fromPartial } from '@total-typescript/shoehorn';
+import { screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import type { ServerWithId } from '../../src/servers/data';
-import { ManageServersRowFactory } from '../../src/servers/ManageServersRow';
+import { ManageServersRow } from '../../src/servers/ManageServersRow';
 import { checkAccessibility } from '../__helpers__/accessibility';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<ManageServersRow />', () => {
-  const ManageServersRow = ManageServersRowFactory(fromPartial({
-    ManageServersRowDropdown: () => <span>ManageServersRowDropdown</span>,
-  }));
   const server: ServerWithId = {
     name: 'My server',
     url: 'https://example.com',
     apiKey: '123',
     id: 'abc',
   };
-  const setUp = (hasAutoConnect = false, autoConnect = false) => render(
+  const setUp = (hasAutoConnect = false, autoConnect = false) => renderWithStore(
     <MemoryRouter>
       <Table header={<Table.Row />}>
         <ManageServersRow server={{ ...server, autoConnect }} hasAutoConnect={hasAutoConnect} />
@@ -34,9 +31,9 @@ describe('<ManageServersRow />', () => {
     expect(screen.getAllByRole('cell')).toHaveLength(expectedCols);
   });
 
-  it('renders a dropdown', () => {
+  it('renders an options dropdown', () => {
     setUp();
-    expect(screen.getByText('ManageServersRowDropdown')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Options' })).toBeInTheDocument();
   });
 
   it.each([

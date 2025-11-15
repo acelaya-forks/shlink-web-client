@@ -3,27 +3,14 @@ import type { FC } from 'react';
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
 import { NoMenuLayout } from '../../common/NoMenuLayout';
-import type { FCWithDeps } from '../../container/utils';
-import { useDependencies } from '../../container/utils';
-import type { SelectedServer } from '../data';
 import { isNotFoundServer } from '../data';
+import { useSelectedServer } from '../reducers/selectedServer';
+import { ServerError } from './ServerError';
 
-export type WithSelectedServerProps = {
-  selectServer: (serverId: string) => void;
-  selectedServer: SelectedServer;
-};
-
-type WithSelectedServerPropsDeps = {
-  ServerError: FC;
-};
-
-export function withSelectedServer<T extends object>(
-  WrappedComponent: FCWithDeps<WithSelectedServerProps & T, WithSelectedServerPropsDeps>,
-) {
-  const ComponentWrapper: FCWithDeps<WithSelectedServerProps & T, WithSelectedServerPropsDeps> = (props) => {
-    const { ServerError } = useDependencies(ComponentWrapper);
+export function withSelectedServer<T extends object>(WrappedComponent: FC<T>) {
+  const ComponentWrapper: FC<T> = (props) => {
     const params = useParams<{ serverId: string }>();
-    const { selectServer, selectedServer } = props;
+    const { selectServer, selectedServer } = useSelectedServer();
 
     useEffect(() => {
       if (params.serverId) {

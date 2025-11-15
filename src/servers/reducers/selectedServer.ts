@@ -1,8 +1,11 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import { memoizeWith } from '@shlinkio/data-manipulation';
 import type { ShlinkHealth } from '@shlinkio/shlink-web-component/api-contract';
+import { useCallback } from 'react';
 import type { ShlinkApiClientBuilder } from '../../api/services/ShlinkApiClientBuilder';
-import { createAsyncThunk } from '../../utils/helpers/redux';
+import { useDependencies } from '../../container/context';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { createAsyncThunk } from '../../store/helpers';
 import { versionToPrintable, versionToSemVer as toSemVer } from '../../utils/helpers/version';
 import type { SelectedServer, ServerWithId } from '../data';
 
@@ -29,9 +32,14 @@ const initialState: SelectedServer = null;
 
 export const resetSelectedServer = createAction<void>(`${REDUCER_PREFIX}/resetSelectedServer`);
 
-export const selectServer = (buildShlinkApiClient: ShlinkApiClientBuilder) => createAsyncThunk(
+export type SelectServerOptions = {
+  serverId: string;
+  buildShlinkApiClient: ShlinkApiClientBuilder;
+};
+
+export const selectServer = createAsyncThunk(
   `${REDUCER_PREFIX}/selectServer`,
-  async (serverId: string, { dispatch, getState }): Promise<SelectedServer> => {
+  async ({ serverId, buildShlinkApiClient }: SelectServerOptions, { dispatch, getState }): Promise<SelectedServer> => {
     dispatch(resetSelectedServer());
 
     const { servers } = getState();
@@ -56,14 +64,29 @@ export const selectServer = (buildShlinkApiClient: ShlinkApiClientBuilder) => cr
   },
 );
 
-type SelectServerThunk = ReturnType<typeof selectServer>;
-
-export const selectedServerReducerCreator = (selectServerThunk: SelectServerThunk) => createSlice({
+export const { reducer: selectedServerReducer } = createSlice({
   name: REDUCER_PREFIX,
-  initialState,
+  initialState: initialState as SelectedServer,
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(resetSelectedServer, () => initialState);
-    builder.addCase(selectServerThunk.fulfilled, (_, { payload }) => payload as any);
+    builder.addCase(selectServer.fulfilled, (_, { payload }) => payload);
   },
 });
+
+export const useSelectedServer = () => {
+  const dispatch = useAppDispatch();
+  const [buildShlinkApiClient] = useDependencies<[ShlinkApiClientBuilder]>('buildShlinkApiClient');
+  const dispatchResetSelectedServer = useCallback(() => dispatch(resetSelectedServer()), [dispatch]);
+  const dispatchSelectServer = useCallback(
+    (serverId: string) => dispatch(selectServer({ serverId, buildShlinkApiClient })),
+    [buildShlinkApiClient, dispatch],
+  );
+  const selectedServer = useAppSelector(({ selectedServer }) => selectedServer);
+
+  return {
+    selectedServer,
+    resetSelectedServer: dispatchResetSelectedServer,
+    selectServer: dispatchSelectServer,
+  };
+};

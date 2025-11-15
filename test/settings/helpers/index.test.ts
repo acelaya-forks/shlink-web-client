@@ -1,6 +1,6 @@
 import { fromPartial } from '@total-typescript/shoehorn';
-import type { ShlinkState } from '../../../src/container/types';
 import { migrateDeprecatedSettings } from '../../../src/settings/helpers';
+import type { RootState } from '../../../src/store';
 
 describe('settings-helpers', () => {
   describe('migrateDeprecatedSettings', () => {
@@ -9,7 +9,7 @@ describe('settings-helpers', () => {
     });
 
     it('updates settings as expected', () => {
-      const state = fromPartial<ShlinkState>({
+      const state = fromPartial<RootState>({
         settings: {
           visits: {
             defaultInterval: 'last180days' as any,

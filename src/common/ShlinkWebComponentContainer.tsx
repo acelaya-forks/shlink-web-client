@@ -4,40 +4,34 @@ import {
   ShlinkSidebarVisibilityProvider,
   ShlinkWebComponent,
 } from '@shlinkio/shlink-web-component';
-import type { Settings } from '@shlinkio/shlink-web-component/settings';
 import type { FC } from 'react';
 import { memo } from 'react';
 import type { ShlinkApiClientBuilder } from '../api/services/ShlinkApiClientBuilder';
-import type { FCWithDeps } from '../container/utils';
-import { componentFactory, useDependencies } from '../container/utils';
+import { withDependencies } from '../container/context';
 import { isReachableServer } from '../servers/data';
-import type { WithSelectedServerProps } from '../servers/helpers/withSelectedServer';
+import { ServerError } from '../servers/helpers/ServerError';
 import { withSelectedServer } from '../servers/helpers/withSelectedServer';
+import { useSelectedServer } from '../servers/reducers/selectedServer';
+import { useSettings } from '../settings/reducers/settings';
 import { NotFound } from './NotFound';
 
-type ShlinkWebComponentContainerProps = WithSelectedServerProps & {
-  settings: Settings;
+export type ShlinkWebComponentContainerProps = {
+  TagColorsStorage: TagColorsStorage;
+  buildShlinkApiClient: ShlinkApiClientBuilder;
 };
 
-type ShlinkWebComponentContainerDeps = {
-  buildShlinkApiClient: ShlinkApiClientBuilder,
-  TagColorsStorage: TagColorsStorage,
-  ServerError: FC,
-};
-
-const ShlinkWebComponentContainer: FCWithDeps<
-  ShlinkWebComponentContainerProps,
-  ShlinkWebComponentContainerDeps
+const ShlinkWebComponentContainerBase: FC<
+  ShlinkWebComponentContainerProps
 // FIXME Using `memo` here to solve a flickering effect in charts.
 //       memo is probably not the right solution. The root cause is the withSelectedServer HOC, but I couldn't fix the
 //       extra rendering there.
 //       This should be revisited at some point.
-> = withSelectedServer(memo(({ selectedServer, settings }) => {
-  const {
-    buildShlinkApiClient,
-    TagColorsStorage: tagColorsStorage,
-    ServerError,
-  } = useDependencies(ShlinkWebComponentContainer);
+> = withSelectedServer(memo(({
+  buildShlinkApiClient,
+  TagColorsStorage: tagColorsStorage,
+}) => {
+  const { selectedServer } = useSelectedServer();
+  const { settings } = useSettings();
 
   if (!isReachableServer(selectedServer)) {
     return <ServerError />;
@@ -62,8 +56,7 @@ const ShlinkWebComponentContainer: FCWithDeps<
   );
 }));
 
-export const ShlinkWebComponentContainerFactory = componentFactory(ShlinkWebComponentContainer, [
+export const ShlinkWebComponentContainer = withDependencies(ShlinkWebComponentContainerBase, [
   'buildShlinkApiClient',
   'TagColorsStorage',
-  'ServerError',
 ]);

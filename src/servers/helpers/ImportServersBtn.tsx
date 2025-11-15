@@ -1,11 +1,11 @@
 import { faFileUpload as importIcon } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Tooltip, useToggle , useTooltip } from '@shlinkio/shlink-frontend-kit';
-import type { ChangeEvent, PropsWithChildren } from 'react';
+import { Button, Tooltip, useToggle, useTooltip } from '@shlinkio/shlink-frontend-kit';
+import type { ChangeEvent, FC, PropsWithChildren } from 'react';
 import { useCallback, useRef, useState } from 'react';
-import type { FCWithDeps } from '../../container/utils';
-import { componentFactory, useDependencies } from '../../container/utils';
-import type { ServerData, ServersMap, ServerWithId } from '../data';
+import { withDependencies } from '../../container/context';
+import type { ServerData } from '../data';
+import { useServers } from '../reducers/servers';
 import type { ServersImporter } from '../services/ServersImporter';
 import { DuplicatedServersModal } from './DuplicatedServersModal';
 import { dedupServers, ensureUniqueIds } from './index';
@@ -15,27 +15,20 @@ export type ImportServersBtnProps = PropsWithChildren<{
   onError?: (error: Error) => void;
   tooltipPlacement?: 'top' | 'bottom';
   className?: string;
+
+  // Injected
+  ServersImporter: ServersImporter
 }>;
 
-type ImportServersBtnConnectProps = ImportServersBtnProps & {
-  createServers: (servers: ServerWithId[]) => void;
-  servers: ServersMap;
-};
-
-type ImportServersBtnDeps = {
-  ServersImporter: ServersImporter
-};
-
-const ImportServersBtn: FCWithDeps<ImportServersBtnConnectProps, ImportServersBtnDeps> = ({
-  createServers,
-  servers,
+const ImportServersBtnBase: FC<ImportServersBtnProps> = ({
   children,
   onImport,
   onError = () => {},
   tooltipPlacement = 'bottom',
   className = '',
+  ServersImporter: serversImporter,
 }) => {
-  const { ServersImporter: serversImporter } = useDependencies(ImportServersBtn);
+  const { createServers, servers } = useServers();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { anchor, tooltip } = useTooltip({ placement: tooltipPlacement });
   const [duplicatedServers, setDuplicatedServers] = useState<ServerData[]>([]);
@@ -111,4 +104,4 @@ const ImportServersBtn: FCWithDeps<ImportServersBtnConnectProps, ImportServersBt
   );
 };
 
-export const ImportServersBtnFactory = componentFactory(ImportServersBtn, ['ServersImporter']);
+export const ImportServersBtn = withDependencies(ImportServersBtnBase, ['ServersImporter']);

@@ -2,24 +2,30 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router';
 import pack from '../package.json';
+import { App } from './app/App';
+import { appUpdateAvailable } from './app/reducers/appUpdates';
+import { ErrorHandler } from './common/ErrorHandler';
+import { ScrollToTop } from './common/ScrollToTop';
 import { container } from './container';
-import { setUpStore } from './container/store';
+import { ContainerProvider } from './container/context';
 import { register as registerServiceWorker } from './serviceWorkerRegistration';
+import { setUpStore } from './store';
 import './tailwind.css';
 
-const store = setUpStore(container);
-const { App, ScrollToTop, ErrorHandler, appUpdateAvailable } = container;
+const store = setUpStore();
 
 createRoot(document.getElementById('root')!).render(
-  <Provider store={store}>
-    <BrowserRouter basename={pack.homepage}>
-      <ErrorHandler>
-        <ScrollToTop>
-          <App />
-        </ScrollToTop>
-      </ErrorHandler>
-    </BrowserRouter>
-  </Provider>,
+  <ContainerProvider value={container}>
+    <Provider store={store}>
+      <BrowserRouter basename={pack.homepage}>
+        <ErrorHandler>
+          <ScrollToTop>
+            <App />
+          </ScrollToTop>
+        </ErrorHandler>
+      </BrowserRouter>
+    </Provider>
+  </ContainerProvider>,
 );
 
 // Learn more about service workers: https://cra.link/PWA

@@ -2,19 +2,18 @@ import { faExternalLinkAlt, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Card } from '@shlinkio/shlink-frontend-kit';
 import { clsx } from 'clsx';
+import type { FC } from 'react';
 import { useEffect } from 'react';
 import { ExternalLink } from 'react-external-link';
 import { useNavigate } from 'react-router';
-import type { ServersMap } from '../servers/data';
+import { withoutSelectedServer } from '../servers/helpers/withoutSelectedServer';
+import { useServers } from '../servers/reducers/servers';
 import { ServersListGroup } from '../servers/ServersListGroup';
 import { ShlinkLogo } from './img/ShlinkLogo';
 
-export type HomeProps = {
-  servers: ServersMap;
-};
-
-export const Home = ({ servers }: HomeProps) => {
+export const Home: FC = withoutSelectedServer(() => {
   const navigate = useNavigate();
+  const { servers } = useServers();
   const serversList = Object.values(servers);
   const hasServers = serversList.length > 0;
 
@@ -68,4 +67,4 @@ export const Home = ({ servers }: HomeProps) => {
       </Card>
     </div>
   );
-};
+});

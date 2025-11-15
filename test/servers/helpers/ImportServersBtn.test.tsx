@@ -1,27 +1,25 @@
 import { screen, waitFor } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
+import { ContainerProvider } from '../../../src/container/context';
 import type { ServerData, ServersMap, ServerWithId } from '../../../src/servers/data';
-import type {
-  ImportServersBtnProps } from '../../../src/servers/helpers/ImportServersBtn';
-import { ImportServersBtnFactory } from '../../../src/servers/helpers/ImportServersBtn';
+import type { ImportServersBtnProps } from '../../../src/servers/helpers/ImportServersBtn';
+import { ImportServersBtn } from '../../../src/servers/helpers/ImportServersBtn';
 import type { ServersImporter } from '../../../src/servers/services/ServersImporter';
 import { checkAccessibility } from '../../__helpers__/accessibility';
-import { renderWithEvents } from '../../__helpers__/setUpTest';
+import { renderWithStore } from '../../__helpers__/setUpTest';
 
 describe('<ImportServersBtn />', () => {
   const csvFile = new File([''], 'servers.csv', { type: 'text/csv' });
   const onImportMock = vi.fn();
-  const createServersMock = vi.fn();
   const importServersFromFile = vi.fn().mockResolvedValue([]);
   const serversImporterMock = fromPartial<ServersImporter>({ importServersFromFile });
-  const ImportServersBtn = ImportServersBtnFactory(fromPartial({ ServersImporter: serversImporterMock }));
-  const setUp = (props: Partial<ImportServersBtnProps> = {}, servers: ServersMap = {}) => renderWithEvents(
-    <ImportServersBtn
-      servers={servers}
-      {...props}
-      createServers={createServersMock}
-      onImport={onImportMock}
-    />,
+  const setUp = (props: Partial<ImportServersBtnProps> = {}, servers: ServersMap = {}) => renderWithStore(
+    <ContainerProvider value={fromPartial({ ServersImporter: serversImporterMock })}>
+      <ImportServersBtn {...props} onImport={onImportMock} />
+    </ContainerProvider>,
+    {
+      initialState: { servers },
+    },
   );
 
   it('passes a11y checks', () => checkAccessibility(setUp()));
@@ -57,11 +55,8 @@ describe('<ImportServersBtn />', () => {
   it('imports servers when file input changes', async () => {
     const { user } = setUp();
 
-    const input = screen.getByTestId('csv-file-input');
-    await user.upload(input, csvFile);
-
+    await user.upload(screen.getByTestId('csv-file-input'), csvFile);
     expect(importServersFromFile).toHaveBeenCalledTimes(1);
-    expect(createServersMock).toHaveBeenCalledTimes(1);
   });
 
   it.each([
@@ -78,26 +73,27 @@ describe('<ImportServersBtn />', () => {
       id: 'existingserver-s.test',
     };
     const newServer: ServerData = { name: 'newServer', url: 'http://s.test/newUrl', apiKey: 'newApiKey' };
-    const { user } = setUp({}, { [existingServer.id]: existingServer });
+    const { user, store } = setUp({}, { [existingServer.id]: existingServer });
 
-    importServersFromFile.mockResolvedValue([existingServer, newServer]);
+    importServersFromFile.mockResolvedValue([existingServerData, newServer]);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     await user.upload(screen.getByTestId('csv-file-input'), csvFile);
 
     // Once the file is uploaded, non-duplicated servers are immediately created
-    expect(createServersMock).toHaveBeenCalledExactlyOnceWith([expect.objectContaining(newServer)]);
+    const { servers } = store.getState();
+    expect(Object.keys(servers)).toHaveLength(2);
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: btnName }));
 
-    // If duplicated servers are saved, there's one extra call
+    // If duplicated servers are saved, there's one extra server creation
     if (savesDuplicatedServers) {
-      expect(createServersMock).toHaveBeenLastCalledWith([expect.objectContaining(existingServerData)]);
+      const { servers } = store.getState();
+      expect(Object.keys(servers)).toHaveLength(3);
     }
 
     // On import is called only once, no matter what
     expect(onImportMock).toHaveBeenCalledOnce();
-    expect(createServersMock).toHaveBeenCalledTimes(savesDuplicatedServers ? 2 : 1);
   });
 });

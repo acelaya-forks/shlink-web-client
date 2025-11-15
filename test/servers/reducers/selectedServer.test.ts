@@ -1,21 +1,19 @@
 import type { ShlinkApiClient } from '@shlinkio/shlink-js-sdk';
 import { fromPartial } from '@total-typescript/shoehorn';
-import type { ShlinkState } from '../../../src/container/types';
 import type { NonReachableServer, NotFoundServer, RegularServer } from '../../../src/servers/data';
 import {
   MAX_FALLBACK_VERSION,
   MIN_FALLBACK_VERSION,
   resetSelectedServer,
-  selectedServerReducerCreator,
-  selectServer as selectServerCreator,
+  selectedServerReducer as reducer,
+  selectServer,
 } from '../../../src/servers/reducers/selectedServer';
+import type { RootState } from '../../../src/store';
 
 describe('selectedServerReducer', () => {
   const dispatch = vi.fn();
   const health = vi.fn();
-  const buildApiClient = vi.fn().mockReturnValue(fromPartial<ShlinkApiClient>({ health }));
-  const selectServer = selectServerCreator(buildApiClient);
-  const { reducer } = selectedServerReducerCreator(selectServer);
+  const buildShlinkApiClient = vi.fn().mockReturnValue(fromPartial<ShlinkApiClient>({ health }));
 
   describe('reducer', () => {
     it('returns default when action is RESET_SELECTED_SERVER', () =>
@@ -23,7 +21,7 @@ describe('selectedServerReducer', () => {
 
     it('returns selected server when action is SELECT_SERVER', () => {
       const payload = fromPartial<RegularServer>({ id: 'abc123' });
-      expect(reducer(null, selectServer.fulfilled(payload, '', ''))).toEqual(payload);
+      expect(reducer(null, selectServer.fulfilled(payload, '', { serverId: '', buildShlinkApiClient }))).toEqual(payload);
     });
   });
 
@@ -50,10 +48,10 @@ describe('selectedServerReducer', () => {
 
       health.mockResolvedValue({ version: serverVersion });
 
-      await selectServer(id)(dispatch, getState, {});
+      await selectServer({ serverId: id, buildShlinkApiClient })(dispatch, getState, {});
 
       expect(getState).toHaveBeenCalledTimes(1);
-      expect(buildApiClient).toHaveBeenCalledTimes(1);
+      expect(buildShlinkApiClient).toHaveBeenCalledTimes(1);
       expect(dispatch).toHaveBeenCalledTimes(3); // "Pending", "reset" and "fulfilled"
       expect(dispatch).toHaveBeenLastCalledWith(expect.objectContaining({ payload: expectedSelectedServer }));
     });
@@ -65,7 +63,7 @@ describe('selectedServerReducer', () => {
 
       health.mockRejectedValue({});
 
-      await selectServer(id)(dispatch, getState, {});
+      await selectServer({ serverId: id, buildShlinkApiClient })(dispatch, getState, {});
 
       expect(health).toHaveBeenCalled();
       expect(dispatch).toHaveBeenLastCalledWith(expect.objectContaining({ payload: expectedSelectedServer }));
@@ -73,10 +71,10 @@ describe('selectedServerReducer', () => {
 
     it('dispatches error when server is not found', async () => {
       const id = crypto.randomUUID();
-      const getState = vi.fn(() => fromPartial<ShlinkState>({ servers: {} }));
+      const getState = vi.fn(() => fromPartial<RootState>({ servers: {} }));
       const expectedSelectedServer: NotFoundServer = { serverNotFound: true };
 
-      await selectServer(id)(dispatch, getState, {});
+      await selectServer({ serverId: id, buildShlinkApiClient })(dispatch, getState, {});
 
       expect(getState).toHaveBeenCalled();
       expect(health).not.toHaveBeenCalled();

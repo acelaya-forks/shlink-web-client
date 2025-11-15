@@ -1,16 +1,15 @@
 import { faPlus as plusIcon, faServer as serverIcon } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Dropdown, NavBar } from '@shlinkio/shlink-frontend-kit';
-import type { SelectedServer, ServersMap } from './data';
+import type { FC } from 'react';
 import { getServerId } from './data';
+import { useSelectedServer } from './reducers/selectedServer';
+import { useServers } from './reducers/servers';
 
-export interface ServersDropdownProps {
-  servers: ServersMap;
-  selectedServer: SelectedServer;
-}
-
-export const ServersDropdown = ({ servers, selectedServer }: ServersDropdownProps) => {
+export const ServersDropdown: FC = () => {
+  const { servers } = useServers();
   const serversList = Object.values(servers);
+  const { selectedServer } = useSelectedServer();
 
   return (
     <NavBar.Dropdown buttonContent={(

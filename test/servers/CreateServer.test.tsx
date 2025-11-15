@@ -2,10 +2,11 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
-import { CreateServerFactory } from '../../src/servers/CreateServer';
+import { ContainerProvider } from '../../src/container/context';
+import { CreateServer } from '../../src/servers/CreateServer';
 import type { ServersMap } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
-import { renderWithEvents } from '../__helpers__/setUpTest';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 type SetUpOptions = {
   serversImported?: boolean;
@@ -14,9 +15,8 @@ type SetUpOptions = {
 };
 
 describe('<CreateServer />', () => {
-  const createServersMock = vi.fn();
   const defaultServers: ServersMap = {
-    foo: fromPartial({ url: 'https://existing_url.com', apiKey: 'existing_api_key' }),
+    foo: fromPartial({ url: 'https://existing_url.com', apiKey: 'existing_api_key', id: 'foo' }),
   };
   const setUp = ({ serversImported = false, importFailed = false, servers = defaultServers }: SetUpOptions = {}) => {
     let callCount = 0;
@@ -25,18 +25,23 @@ describe('<CreateServer />', () => {
       callCount += 1;
       return result;
     });
-    const CreateServer = CreateServerFactory(fromPartial({
-      ImportServersBtn: () => <>ImportServersBtn</>,
-      useTimeoutToggle,
-    }));
     const history = createMemoryHistory({ initialEntries: ['/foo', '/bar'] });
 
     return {
       history,
-      ...renderWithEvents(
+      ...renderWithStore(
         <Router location={history.location} navigator={history}>
-          <CreateServer createServers={createServersMock} servers={servers} />
+          <ContainerProvider value={fromPartial({
+            ImportServersBtn: () => <>ImportServersBtn</>,
+            useTimeoutToggle,
+            buildShlinkApiClient: vi.fn(),
+          })}>
+            <CreateServer />
+          </ContainerProvider>
         </Router>,
+        {
+          initialState: { servers },
+        },
       ),
     };
   };
@@ -62,27 +67,24 @@ describe('<CreateServer />', () => {
     expect(screen.getByText('The servers could not be imported. Make sure the format is correct.')).toBeInTheDocument();
   });
 
-  it('shows import button when no servers exist yet', () => {
-    setUp({ servers: {} });
-    expect(screen.queryByText('ImportServersBtn')).toBeInTheDocument();
-  });
-
   it('creates server data when form is submitted', async () => {
-    const { user, history } = setUp();
-
-    expect(createServersMock).not.toHaveBeenCalled();
+    const { user, history, store } = setUp();
+    const expectedServerId = 'the_name-the_url.com';
 
     await user.type(screen.getByLabelText(/^Name/), 'the_name');
     await user.type(screen.getByLabelText(/^URL/), 'https://the_url.com');
     await user.type(screen.getByLabelText(/^API key/), 'the_api_key');
-    fireEvent.submit(screen.getByRole('form'));
 
-    expect(createServersMock).toHaveBeenCalledWith([expect.objectContaining({
+    expect(store.getState().servers[expectedServerId]).not.toBeDefined();
+    fireEvent.submit(screen.getByRole('form'));
+    expect(store.getState().servers[expectedServerId]).toEqual(expect.objectContaining({
+      id: expectedServerId,
       name: 'the_name',
       url: 'https://the_url.com',
       apiKey: 'the_api_key',
-    })]);
-    expect(history.location.pathname).toEqual(expect.stringMatching(/^\/server\//));
+    }));
+
+    expect(history.location.pathname).toEqual(`/server/${expectedServerId}`);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
@@ -92,12 +94,12 @@ describe('<CreateServer />', () => {
     await user.type(screen.getByLabelText(/^Name/), 'the_name');
     await user.type(screen.getByLabelText(/^URL/), 'https://existing_url.com');
     await user.type(screen.getByLabelText(/^API key/), 'existing_api_key');
+
     fireEvent.submit(screen.getByRole('form'));
 
     await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Discard' }));
 
-    expect(createServersMock).not.toHaveBeenCalled();
     expect(history.location.pathname).toEqual('/foo'); // Goes back to first route from history's initialEntries
   });
 });

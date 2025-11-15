@@ -1,29 +1,34 @@
 import { screen, waitFor } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
+import { ContainerProvider } from '../../src/container/context';
 import type { ServersMap, ServerWithId } from '../../src/servers/data';
-import { ManageServersFactory } from '../../src/servers/ManageServers';
+import { ManageServers } from '../../src/servers/ManageServers';
 import type { ServersExporter } from '../../src/servers/services/ServersExporter';
 import { checkAccessibility } from '../__helpers__/accessibility';
-import { renderWithEvents } from '../__helpers__/setUpTest';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<ManageServers />', () => {
   const exportServers = vi.fn();
   const serversExporter = fromPartial<ServersExporter>({ exportServers });
   const useTimeoutToggle = vi.fn().mockReturnValue([false, vi.fn()]);
-  const ManageServers = ManageServersFactory(fromPartial({
-    ServersExporter: serversExporter,
-    ImportServersBtn: () => <span>ImportServersBtn</span>,
-    useTimeoutToggle,
-    ManageServersRow: ({ hasAutoConnect }: { hasAutoConnect: boolean }) => (
-      <tr><td>ManageServersRow {hasAutoConnect ? '[YES]' : '[NO]'}</td></tr>
-    ),
-  }));
   const createServerMock = (value: string, autoConnect = false) => fromPartial<ServerWithId>(
     { id: value, name: value, url: value, autoConnect },
   );
-  const setUp = (servers: ServersMap = {}) => renderWithEvents(
-    <MemoryRouter><ManageServers servers={servers} /></MemoryRouter>,
+  const setUp = (servers: ServersMap = {}) => renderWithStore(
+    <MemoryRouter>
+      <ContainerProvider value={fromPartial({
+        ServersExporter: serversExporter,
+        ImportServersBtn: () => <span>ImportServersBtn</span>,
+        useTimeoutToggle,
+        buildShlinkApiClient: vi.fn(),
+      })}>
+        <ManageServers />
+      </ContainerProvider>
+    </MemoryRouter>,
+    {
+      initialState: { servers },
+    },
   );
 
   it('passes a11y checks', () => checkAccessibility(setUp({
@@ -42,20 +47,22 @@ describe('<ManageServers />', () => {
       await user.clear(screen.getByPlaceholderText('Search...'));
       await user.type(screen.getByPlaceholderText('Search...'), searchTerm);
     };
+    // Add one for the header row
+    const expectRows = (amount: number) => expect(screen.getAllByRole('row')).toHaveLength(amount + 1);
 
-    expect(screen.getAllByText(/^ManageServersRow/)).toHaveLength(3);
+    expectRows(3);
     expect(screen.queryByText('No servers found.')).not.toBeInTheDocument();
 
     await search('foo');
-    await waitFor(() => expect(screen.getAllByText(/^ManageServersRow/)).toHaveLength(1));
+    await waitFor(() => expectRows(1));
     expect(screen.queryByText('No servers found.')).not.toBeInTheDocument();
 
     await search('Ba');
-    await waitFor(() => expect(screen.getAllByText(/^ManageServersRow/)).toHaveLength(2));
+    await waitFor(() => expectRows(2));
     expect(screen.queryByText('No servers found.')).not.toBeInTheDocument();
 
     await search('invalid');
-    await waitFor(() => expect(screen.queryByText(/^ManageServersRow/)).not.toBeInTheDocument());
+    await waitFor(() => expectRows(1));
     expect(screen.getByText('No servers found.')).toBeInTheDocument();
   });
 
@@ -67,11 +74,9 @@ describe('<ManageServers />', () => {
 
     expect(screen.getAllByRole('columnheader')).toHaveLength(expectedCols);
     if (server.autoConnect) {
-      expect(screen.getByText(/\[YES]/)).toBeInTheDocument();
-      expect(screen.queryByText(/\[NO]/)).not.toBeInTheDocument();
+      expect(screen.getByTestId('auto-connect')).toBeInTheDocument();
     } else {
-      expect(screen.queryByText(/\[YES]/)).not.toBeInTheDocument();
-      expect(screen.getByText(/\[NO]/)).toBeInTheDocument();
+      expect(screen.queryByTestId('auto-connect')).not.toBeInTheDocument();
     }
   });
 

@@ -27,6 +27,7 @@ exports[`<ManageServersRow /> > renders auto-connect icon only if server is auto
             class="svg-inline--fa fa-check text-lm-brand dark:text-dm-brand"
             data-icon="check"
             data-prefix="fas"
+            data-testid="auto-connect"
             role="img"
             viewBox="0 0 448 512"
           >
@@ -56,9 +57,32 @@ exports[`<ManageServersRow /> > renders auto-connect icon only if server is auto
         <td
           class="border-lm-border dark:border-dm-border p-2 block lg:table-cell not-last:border-b-1 lg:border-b-1 before:lg:hidden before:content-[attr(data-column)] before:font-bold before:mr-1 text-right max-lg:absolute right-0 -top-1 mx-lg:pt-0"
         >
-          <span>
-            ManageServersRowDropdown
-          </span>
+          <div
+            class="relative inline-block"
+          >
+            <button
+              aria-controls="_r_o_"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-label="Options"
+              class="flex items-center rounded-md focus-ring cursor-pointer border border-lm-border dark:border-dm-border bg-lm-primary dark:bg-dm-primary group-[&]/card:bg-lm-input group-[&]/card:dark:bg-dm-input px-3 py-1.5 gap-x-2"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="svg-inline--fa fa-ellipsis-vertical fa-width-auto"
+                data-icon="ellipsis-vertical"
+                data-prefix="fas"
+                role="img"
+                viewBox="0 0 128 512"
+              >
+                <path
+                  d="M64 144a56 56 0 1 1 0-112 56 56 0 1 1 0 112zm0 224c30.9 0 56 25.1 56 56s-25.1 56-56 56-56-25.1-56-56 25.1-56 56-56zm56-112c0 30.9-25.1 56-56 56s-56-25.1-56-56 25.1-56 56-56 56 25.1 56 56z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -108,9 +132,32 @@ exports[`<ManageServersRow /> > renders auto-connect icon only if server is auto
         <td
           class="border-lm-border dark:border-dm-border p-2 block lg:table-cell not-last:border-b-1 lg:border-b-1 before:lg:hidden before:content-[attr(data-column)] before:font-bold before:mr-1 text-right max-lg:absolute right-0 -top-1 mx-lg:pt-0"
         >
-          <span>
-            ManageServersRowDropdown
-          </span>
+          <div
+            class="relative inline-block"
+          >
+            <button
+              aria-controls="_r_t_"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-label="Options"
+              class="flex items-center rounded-md focus-ring cursor-pointer border border-lm-border dark:border-dm-border bg-lm-primary dark:bg-dm-primary group-[&]/card:bg-lm-input group-[&]/card:dark:bg-dm-input px-3 py-1.5 gap-x-2"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="svg-inline--fa fa-ellipsis-vertical fa-width-auto"
+                data-icon="ellipsis-vertical"
+                data-prefix="fas"
+                role="img"
+                viewBox="0 0 128 512"
+              >
+                <path
+                  d="M64 144a56 56 0 1 1 0-112 56 56 0 1 1 0 112zm0 224c30.9 0 56 25.1 56 56s-25.1 56-56 56-56-25.1-56-56 25.1-56 56-56zm56-112c0 30.9-25.1 56-56 56s-56-25.1-56-56 25.1-56 56-56 56 25.1 56 56z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>

@@ -1,21 +1,23 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
+import { useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store';
 import type { ServerData, ServersMap, ServerWithId } from '../data';
 import { serversListToMap } from '../helpers';
 
-interface EditServer {
+type EditServer = {
   serverId: string;
   serverData: Partial<ServerData>;
-}
+};
 
-interface SetAutoConnect {
+type SetAutoConnect = {
   serverId: string;
   autoConnect: boolean;
-}
+};
 
 const initialState: ServersMap = {};
 
-export const { actions, reducer } = createSlice({
+export const { actions, reducer: serversReducer } = createSlice({
   name: 'shlink/servers',
   initialState,
   reducers: {
@@ -65,4 +67,19 @@ export const { actions, reducer } = createSlice({
 
 export const { editServer, deleteServer, setAutoConnect, createServers } = actions;
 
-export const serversReducer = reducer;
+export const useServers = () => {
+  const dispatch = useAppDispatch();
+  const servers = useAppSelector((state) => state.servers);
+  const editServer = useCallback(
+    (serverId: string, serverData: Partial<ServerData>) => dispatch(actions.editServer(serverId, serverData)),
+    [dispatch],
+  );
+  const deleteServer = useCallback((server: ServerWithId) => dispatch(actions.deleteServer(server)), [dispatch]);
+  const setAutoConnect = useCallback(
+    (serverData: ServerWithId, autoConnect: boolean) => dispatch(actions.setAutoConnect(serverData, autoConnect)),
+    [dispatch],
+  );
+  const createServers = useCallback((servers: ServerWithId[]) => dispatch(actions.createServers(servers)), [dispatch]);
+
+  return { servers, editServer, deleteServer, setAutoConnect, createServers };
+};
