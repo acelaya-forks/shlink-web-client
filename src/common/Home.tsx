@@ -6,11 +6,12 @@ import type { FC } from 'react';
 import { useEffect } from 'react';
 import { ExternalLink } from 'react-external-link';
 import { useNavigate } from 'react-router';
+import { withoutSelectedServer } from '../servers/helpers/withoutSelectedServer';
 import { useServers } from '../servers/reducers/servers';
 import { ServersListGroup } from '../servers/ServersListGroup';
 import { ShlinkLogo } from './img/ShlinkLogo';
 
-export const Home: FC = () => {
+export const Home: FC = withoutSelectedServer(() => {
   const navigate = useNavigate();
   const { servers } = useServers();
   const serversList = Object.values(servers);
@@ -66,4 +67,4 @@ export const Home: FC = () => {
       </Card>
     </div>
   );
-};
+});

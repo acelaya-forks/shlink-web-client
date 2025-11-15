@@ -4,33 +4,22 @@ import type { FC } from 'react';
 import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import { AppUpdateBanner } from '../common/AppUpdateBanner';
+import { Home } from '../common/Home';
 import { MainHeader } from '../common/MainHeader';
 import { NotFound } from '../common/NotFound';
 import { ShlinkVersionsContainer } from '../common/ShlinkVersionsContainer';
-import type { FCWithDeps } from '../container/utils';
-import { componentFactory, useDependencies } from '../container/utils';
+import { ShlinkWebComponentContainer } from '../common/ShlinkWebComponentContainer';
+import { CreateServer } from '../servers/CreateServer';
 import { EditServer } from '../servers/EditServer';
+import { ManageServers } from '../servers/ManageServers';
 import { useLoadRemoteServers } from '../servers/reducers/remoteServers';
 import { useSettings } from '../settings/reducers/settings';
 import { Settings } from '../settings/Settings';
 import { forceUpdate } from '../utils/helpers/sw';
 import { useAppUpdated } from './reducers/appUpdates';
 
-type AppDeps = {
-  Home: FC;
-  ShlinkWebComponentContainer: FC;
-  CreateServer: FC;
-  ManageServers: FC;
-};
-
-const App: FCWithDeps<any, AppDeps> = () => {
+export const App: FC = () => {
   const { appUpdated, resetAppUpdate } = useAppUpdated();
-  const {
-    Home,
-    ShlinkWebComponentContainer,
-    CreateServer,
-    ManageServers,
-  } = useDependencies(App);
 
   useLoadRemoteServers();
 
@@ -80,10 +69,3 @@ const App: FCWithDeps<any, AppDeps> = () => {
     </div>
   );
 };
-
-export const AppFactory = componentFactory(App, [
-  'Home',
-  'ShlinkWebComponentContainer',
-  'CreateServer',
-  'ManageServers',
-]);

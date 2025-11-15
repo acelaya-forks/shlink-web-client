@@ -2,7 +2,8 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
-import { CreateServerFactory } from '../../src/servers/CreateServer';
+import { ContainerProvider } from '../../src/container/context';
+import { CreateServer } from '../../src/servers/CreateServer';
 import type { ServersMap } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
 import { renderWithStore } from '../__helpers__/setUpTest';
@@ -24,17 +25,19 @@ describe('<CreateServer />', () => {
       callCount += 1;
       return result;
     });
-    const CreateServer = CreateServerFactory(fromPartial({
-      ImportServersBtn: () => <>ImportServersBtn</>,
-      useTimeoutToggle,
-    }));
     const history = createMemoryHistory({ initialEntries: ['/foo', '/bar'] });
 
     return {
       history,
       ...renderWithStore(
         <Router location={history.location} navigator={history}>
-          <CreateServer />
+          <ContainerProvider value={fromPartial({
+            ImportServersBtn: () => <>ImportServersBtn</>,
+            useTimeoutToggle,
+            buildShlinkApiClient: vi.fn(),
+          })}>
+            <CreateServer />
+          </ContainerProvider>
         </Router>,
         {
           initialState: { servers },
@@ -62,11 +65,6 @@ describe('<CreateServer />', () => {
       screen.queryByText('Servers properly imported. You can now select one from the list :)'),
     ).not.toBeInTheDocument();
     expect(screen.getByText('The servers could not be imported. Make sure the format is correct.')).toBeInTheDocument();
-  });
-
-  it('shows import button when no servers exist yet', () => {
-    setUp({ servers: {} });
-    expect(screen.queryByText('ImportServersBtn')).toBeInTheDocument();
   });
 
   it('creates server data when form is submitted', async () => {

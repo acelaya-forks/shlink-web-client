@@ -1,23 +1,22 @@
-import type { ResultProps,TimeoutToggle  } from '@shlinkio/shlink-frontend-kit';
-import { Button, Result,useToggle  } from '@shlinkio/shlink-frontend-kit';
+import type { ResultProps, TimeoutToggle } from '@shlinkio/shlink-frontend-kit';
+import { Button, Result, useToggle } from '@shlinkio/shlink-frontend-kit';
 import type { FC } from 'react';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { NoMenuLayout } from '../common/NoMenuLayout';
-import type { FCWithDeps } from '../container/utils';
-import { componentFactory, useDependencies } from '../container/utils';
+import { withDependencies } from '../container/context';
 import { useGoBack } from '../utils/helpers/hooks';
 import type { ServerData } from './data';
 import { ensureUniqueIds } from './helpers';
 import { DuplicatedServersModal } from './helpers/DuplicatedServersModal';
-import type { ImportServersBtnProps } from './helpers/ImportServersBtn';
+import { ImportServersBtn } from './helpers/ImportServersBtn';
 import { ServerForm } from './helpers/ServerForm';
+import { withoutSelectedServer } from './helpers/withoutSelectedServer';
 import { useServers } from './reducers/servers';
 
 const SHOW_IMPORT_MSG_TIME = 4000;
 
-type CreateServerDeps = {
-  ImportServersBtn: FC<ImportServersBtnProps>;
+export type CreateServerProps = {
   useTimeoutToggle: TimeoutToggle;
 };
 
@@ -30,15 +29,12 @@ const ImportResult = ({ variant }: Pick<ResultProps, 'variant'>) => (
   </div>
 );
 
-const CreateServer: FCWithDeps<any, CreateServerDeps> = () => {
+const CreateServerBase: FC<CreateServerProps> = withoutSelectedServer(({ useTimeoutToggle }) => {
   const { servers, createServers } = useServers();
-  const { ImportServersBtn, useTimeoutToggle } = useDependencies(CreateServer);
   const navigate = useNavigate();
   const goBack = useGoBack();
   const hasServers = !!Object.keys(servers).length;
-  // eslint-disable-next-line react-compiler/react-compiler
   const [serversImported, setServersImported] = useTimeoutToggle({ delay: SHOW_IMPORT_MSG_TIME });
-  // eslint-disable-next-line react-compiler/react-compiler
   const [errorImporting, setErrorImporting] = useTimeoutToggle({ delay: SHOW_IMPORT_MSG_TIME });
   const { flag: isConfirmModalOpen, toggle: toggleConfirmModal } = useToggle();
   const [serverData, setServerData] = useState<ServerData>();
@@ -83,6 +79,6 @@ const CreateServer: FCWithDeps<any, CreateServerDeps> = () => {
       />
     </NoMenuLayout>
   );
-};
+});
 
-export const CreateServerFactory = componentFactory(CreateServer, ['ImportServersBtn', 'useTimeoutToggle']);
+export const CreateServer = withDependencies(CreateServerBase, ['useTimeoutToggle']);

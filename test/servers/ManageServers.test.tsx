@@ -1,8 +1,9 @@
 import { screen, waitFor } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
+import { ContainerProvider } from '../../src/container/context';
 import type { ServersMap, ServerWithId } from '../../src/servers/data';
-import { ManageServersFactory } from '../../src/servers/ManageServers';
+import { ManageServers } from '../../src/servers/ManageServers';
 import type { ServersExporter } from '../../src/servers/services/ServersExporter';
 import { checkAccessibility } from '../__helpers__/accessibility';
 import { renderWithStore } from '../__helpers__/setUpTest';
@@ -11,16 +12,20 @@ describe('<ManageServers />', () => {
   const exportServers = vi.fn();
   const serversExporter = fromPartial<ServersExporter>({ exportServers });
   const useTimeoutToggle = vi.fn().mockReturnValue([false, vi.fn()]);
-  const ManageServers = ManageServersFactory(fromPartial({
-    ServersExporter: serversExporter,
-    ImportServersBtn: () => <span>ImportServersBtn</span>,
-    useTimeoutToggle,
-  }));
   const createServerMock = (value: string, autoConnect = false) => fromPartial<ServerWithId>(
     { id: value, name: value, url: value, autoConnect },
   );
   const setUp = (servers: ServersMap = {}) => renderWithStore(
-    <MemoryRouter><ManageServers /></MemoryRouter>,
+    <MemoryRouter>
+      <ContainerProvider value={fromPartial({
+        ServersExporter: serversExporter,
+        ImportServersBtn: () => <span>ImportServersBtn</span>,
+        useTimeoutToggle,
+        buildShlinkApiClient: vi.fn(),
+      })}>
+        <ManageServers />
+      </ContainerProvider>
+    </MemoryRouter>,
     {
       initialState: { servers },
     },
