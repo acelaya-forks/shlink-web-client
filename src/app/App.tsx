@@ -14,11 +14,7 @@ import { useLoadRemoteServers } from '../servers/reducers/remoteServers';
 import { useSettings } from '../settings/reducers/settings';
 import { Settings } from '../settings/Settings';
 import { forceUpdate } from '../utils/helpers/sw';
-
-export type AppProps = {
-  resetAppUpdate: () => void;
-  appUpdated: boolean;
-};
+import { useAppUpdated } from './reducers/appUpdates';
 
 type AppDeps = {
   Home: FC;
@@ -27,7 +23,8 @@ type AppDeps = {
   ManageServers: FC;
 };
 
-const App: FCWithDeps<AppProps, AppDeps> = ({ appUpdated, resetAppUpdate }) => {
+const App: FCWithDeps<any, AppDeps> = () => {
+  const { appUpdated, resetAppUpdate } = useAppUpdated();
   const {
     Home,
     ShlinkWebComponentContainer,

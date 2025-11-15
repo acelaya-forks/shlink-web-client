@@ -22,7 +22,7 @@ describe('<App />', () => {
       <ContainerProvider
         value={fromPartial({ HttpClient: fromPartial<HttpClient>({}), buildShlinkApiClient: vi.fn() })}
       >
-        <App appUpdated={false} resetAppUpdate={() => {}} />
+        <App />
       </ContainerProvider>
     </MemoryRouter>,
     {
@@ -32,6 +32,7 @@ describe('<App />', () => {
           def456: fromPartial<ServerWithId>({ id: 'def456', name: 'def456 server' }),
         },
         settings: fromPartial({}),
+        appUpdated: false,
       },
     },
   ));

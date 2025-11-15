@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router';
 import pack from '../package.json';
+import { appUpdateAvailable } from './app/reducers/appUpdates';
 import { ErrorHandler } from './common/ErrorHandler';
 import { ScrollToTop } from './common/ScrollToTop';
 import { container } from './container';
@@ -11,7 +12,7 @@ import { setUpStore } from './store';
 import './tailwind.css';
 
 const store = setUpStore();
-const { App, appUpdateAvailable } = container;
+const { App } = container;
 
 createRoot(document.getElementById('root')!).render(
   <ContainerProvider value={container}>
