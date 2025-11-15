@@ -2,22 +2,21 @@ import { screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { createMemoryHistory } from 'history';
 import { Router } from 'react-router';
-import { MainHeaderFactory } from '../../src/common/MainHeader';
+import { MainHeader } from '../../src/common/MainHeader';
+import { ContainerProvider } from '../../src/container/context';
 import { checkAccessibility } from '../__helpers__/accessibility';
-import { renderWithEvents } from '../__helpers__/setUpTest';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<MainHeader />', () => {
-  const MainHeader = MainHeaderFactory(fromPartial({
-    // Fake this component as a li[role="menuitem"], as it gets rendered inside a ul[role="menu"]
-    ServersDropdown: () => <li role="menuitem">ServersDropdown</li>,
-  }));
   const setUp = (pathname = '') => {
     const history = createMemoryHistory();
     history.push(pathname);
 
-    return renderWithEvents(
+    return renderWithStore(
       <Router location={history.location} navigator={history}>
-        <MainHeader />
+        <ContainerProvider value={fromPartial({ buildShlinkApiClient: vi.fn() })}>
+          <MainHeader />
+        </ContainerProvider>
       </Router>,
     );
   };
@@ -26,7 +25,7 @@ describe('<MainHeader />', () => {
 
   it('renders ServersDropdown', () => {
     setUp();
-    expect(screen.getByText('ServersDropdown')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Servers' })).toBeInTheDocument();
   });
 
   it.each([

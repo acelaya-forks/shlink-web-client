@@ -1,50 +1,51 @@
-import { act, render, screen } from '@testing-library/react';
+import type { HttpClient } from '@shlinkio/shlink-js-sdk';
+import { act, screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { MemoryRouter } from 'react-router';
 import { AppFactory } from '../../src/app/App';
+import { ContainerProvider } from '../../src/container/context';
+import type { ServerWithId } from '../../src/servers/data';
 import { checkAccessibility } from '../__helpers__/accessibility';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<App />', () => {
   const App = AppFactory(
     fromPartial({
-      MainHeader: () => <>MainHeader</>,
       Home: () => <>Home</>,
       ShlinkWebComponentContainer: () => <>ShlinkWebComponentContainer</>,
       CreateServer: () => <>CreateServer</>,
-      EditServer: () => <>EditServer</>,
-      Settings: () => <>SettingsComp</>,
       ManageServers: () => <>ManageServers</>,
-      ShlinkVersionsContainer: () => <>ShlinkVersions</>,
     }),
   );
-  const setUp = async (activeRoute = '/') => act(() => render(
+  const setUp = async (activeRoute = '/') => act(() => renderWithStore(
     <MemoryRouter initialEntries={[{ pathname: activeRoute }]}>
-      <App
-        fetchServers={() => {}}
-        servers={{}}
-        settings={fromPartial({})}
-        appUpdated={false}
-        resetAppUpdate={() => {}}
-      />
+      <ContainerProvider
+        value={fromPartial({ HttpClient: fromPartial<HttpClient>({}), buildShlinkApiClient: vi.fn() })}
+      >
+        <App />
+      </ContainerProvider>
     </MemoryRouter>,
+    {
+      initialState: {
+        servers: {
+          abc123: fromPartial<ServerWithId>({ id: 'abc123', name: 'abc123 server' }),
+          def456: fromPartial<ServerWithId>({ id: 'def456', name: 'def456 server' }),
+        },
+        settings: fromPartial({}),
+        appUpdated: false,
+      },
+    },
   ));
 
   it('passes a11y checks', () => checkAccessibility(setUp()));
 
-  it('renders children components', async () => {
-    await setUp();
-
-    expect(screen.getByText('MainHeader')).toBeInTheDocument();
-    expect(screen.getByText('ShlinkVersions')).toBeInTheDocument();
-  });
-
   it.each([
-    ['/settings/foo', 'SettingsComp'],
-    ['/settings/bar', 'SettingsComp'],
+    ['/settings/general', 'User interface'],
+    ['/settings/short-urls', 'Short URLs form'],
     ['/manage-servers', 'ManageServers'],
     ['/server/create', 'CreateServer'],
-    ['/server/abc123/edit', 'EditServer'],
-    ['/server/def456/edit', 'EditServer'],
+    ['/server/abc123/edit', 'Edit "abc123 server"'],
+    ['/server/def456/edit', 'Edit "def456 server"'],
     ['/server/abc123/foo', 'ShlinkWebComponentContainer'],
     ['/server/def456/bar', 'ShlinkWebComponentContainer'],
     ['/other', 'Oops! We could not find requested route.'],

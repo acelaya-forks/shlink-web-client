@@ -79,9 +79,8 @@ describe('remoteServersReducer', () => {
       },
     ])('tries to fetch servers from remote', async ({ serversArray, expectedNewServers }) => {
       jsonRequest.mockResolvedValue(serversArray);
-      const doFetchServers = fetchServers(httpClient);
 
-      await doFetchServers()(dispatch, vi.fn(), {});
+      await fetchServers(httpClient)(dispatch, vi.fn(), {});
 
       expect(dispatch).toHaveBeenCalledTimes(3);
       expect(dispatch).toHaveBeenNthCalledWith(2, expect.objectContaining({ payload: expectedNewServers }));

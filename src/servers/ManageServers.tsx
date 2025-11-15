@@ -7,31 +7,26 @@ import { useMemo, useState } from 'react';
 import { NoMenuLayout } from '../common/NoMenuLayout';
 import type { FCWithDeps } from '../container/utils';
 import { componentFactory, useDependencies } from '../container/utils';
-import type { ServersMap } from './data';
 import type { ImportServersBtnProps } from './helpers/ImportServersBtn';
-import type { ManageServersRowProps } from './ManageServersRow';
+import { ManageServersRow } from './ManageServersRow';
+import { useServers } from './reducers/servers';
 import type { ServersExporter } from './services/ServersExporter';
-
-type ManageServersProps = {
-  servers: ServersMap;
-};
 
 type ManageServersDeps = {
   ServersExporter: ServersExporter;
   ImportServersBtn: FC<ImportServersBtnProps>;
   useTimeoutToggle: TimeoutToggle;
-  ManageServersRow: FC<ManageServersRowProps>;
 };
 
 const SHOW_IMPORT_MSG_TIME = 4000;
 
-const ManageServers: FCWithDeps<ManageServersProps, ManageServersDeps> = ({ servers }) => {
+const ManageServers: FCWithDeps<unknown, ManageServersDeps> = () => {
   const {
     ServersExporter: serversExporter,
     ImportServersBtn,
     useTimeoutToggle,
-    ManageServersRow,
   } = useDependencies(ManageServers);
+  const { servers } = useServers();
   const [searchTerm, setSearchTerm] = useState('');
   const allServers = useMemo(() => Object.values(servers), [servers]);
   const filteredServers = useMemo(
@@ -93,5 +88,4 @@ export const ManageServersFactory = componentFactory(ManageServers, [
   'ServersExporter',
   'ImportServersBtn',
   'useTimeoutToggle',
-  'ManageServersRow',
 ]);

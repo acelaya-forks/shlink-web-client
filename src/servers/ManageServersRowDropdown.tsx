@@ -6,29 +6,18 @@ import {
   faPlug as connectIcon,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { RowDropdown,useToggle  } from '@shlinkio/shlink-frontend-kit';
+import { RowDropdown, useToggle } from '@shlinkio/shlink-frontend-kit';
 import type { FC } from 'react';
-import type { FCWithDeps } from '../container/utils';
-import { componentFactory, useDependencies } from '../container/utils';
 import type { ServerWithId } from './data';
-import type { DeleteServerModalProps } from './DeleteServerModal';
+import { DeleteServerModal } from './DeleteServerModal';
+import { useServers } from './reducers/servers';
 
 export type ManageServersRowDropdownProps = {
   server: ServerWithId;
 };
 
-type ManageServersRowDropdownConnectProps = ManageServersRowDropdownProps & {
-  setAutoConnect: (server: ServerWithId, autoConnect: boolean) => void;
-};
-
-type ManageServersRowDropdownDeps = {
-  DeleteServerModal: FC<DeleteServerModalProps>
-};
-
-const ManageServersRowDropdown: FCWithDeps<ManageServersRowDropdownConnectProps, ManageServersRowDropdownDeps> = (
-  { server, setAutoConnect },
-) => {
-  const { DeleteServerModal } = useDependencies(ManageServersRowDropdown);
+export const ManageServersRowDropdown: FC<ManageServersRowDropdownProps> = ({ server }) => {
+  const { setAutoConnect } = useServers();
   const { flag: isModalOpen, setToTrue: showModal, setToFalse: hideModal } = useToggle();
   const serverUrl = `/server/${server.id}`;
   const { autoConnect: isAutoConnect } = server;
@@ -56,5 +45,3 @@ const ManageServersRowDropdown: FCWithDeps<ManageServersRowDropdownConnectProps,
     </>
   );
 };
-
-export const ManageServersRowDropdownFactory = componentFactory(ManageServersRowDropdown, ['DeleteServerModal']);

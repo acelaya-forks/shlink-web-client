@@ -3,19 +3,14 @@ import { fromPartial } from '@total-typescript/shoehorn';
 import { createMemoryHistory } from 'history';
 import type { ReactNode } from 'react';
 import { Router } from 'react-router';
-import { DeleteServerButtonFactory } from '../../src/servers/DeleteServerButton';
-import type { DeleteServerModalProps } from '../../src/servers/DeleteServerModal';
-import { DeleteServerModal } from '../../src/servers/DeleteServerModal';
+import { DeleteServerButton } from '../../src/servers/DeleteServerButton';
 import { checkAccessibility } from '../__helpers__/accessibility';
-import { renderWithEvents } from '../__helpers__/setUpTest';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<DeleteServerButton />', () => {
-  const DeleteServerButton = DeleteServerButtonFactory(fromPartial({
-    DeleteServerModal: (props: DeleteServerModalProps) => <DeleteServerModal {...props} deleteServer={vi.fn()} />,
-  }));
   const setUp = (children: ReactNode = 'Remove this server') => {
     const history = createMemoryHistory({ initialEntries: ['/foo'] });
-    const result = renderWithEvents(
+    const result = renderWithStore(
       <Router location={history.location} navigator={history}>
         <DeleteServerButton server={fromPartial({})}>{children}</DeleteServerButton>
       </Router>,

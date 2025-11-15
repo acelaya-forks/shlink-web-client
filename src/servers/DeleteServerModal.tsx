@@ -3,6 +3,7 @@ import { CardModal } from '@shlinkio/shlink-frontend-kit';
 import type { FC } from 'react';
 import { useCallback } from 'react';
 import type { ServerWithId } from './data';
+import { useServers } from './reducers/servers';
 
 export type DeleteServerModalProps = {
   server: ServerWithId;
@@ -10,11 +11,8 @@ export type DeleteServerModalProps = {
   open: boolean;
 };
 
-type DeleteServerModalConnectProps = DeleteServerModalProps & {
-  deleteServer: (server: ServerWithId) => void;
-};
-
-export const DeleteServerModal: FC<DeleteServerModalConnectProps> = ({ server, onClose, open, deleteServer }) => {
+export const DeleteServerModal: FC<DeleteServerModalProps> = ({ server, onClose, open }) => {
+  const { deleteServer } = useServers();
   const onClosed = useCallback((exitAction: ExitAction) => {
     if (exitAction === 'confirm') {
       deleteServer(server);

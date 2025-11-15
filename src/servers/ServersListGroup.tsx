@@ -26,18 +26,16 @@ const ServerListItem = ({ id, name }: { id: string; name: string }) => (
 );
 
 export const ServersListGroup: FC<ServersListGroupProps> = ({ servers, borderless }) => (
-  <>
-    {servers.length > 0 && (
-      <div
-        data-testid="list"
-        className={clsx(
-          'w-full border-lm-border dark:border-dm-border',
-          'md:max-h-56 md:overflow-y-auto -mb-1 scroll-thin',
-          { 'border-y': !borderless },
-        )}
-      >
-        {servers.map(({ id, name }) => <ServerListItem key={id} id={id} name={name} />)}
-      </div>
-    )}
-  </>
+  servers.length > 0 && (
+    <div
+      data-testid="list"
+      className={clsx(
+        'w-full border-lm-border dark:border-dm-border',
+        'md:max-h-56 md:overflow-y-auto -mb-1 scroll-thin',
+        { 'border-y': !borderless },
+      )}
+    >
+      {servers.map(({ id, name }) => <ServerListItem key={id} id={id} name={name} />)}
+    </div>
+  )
 );

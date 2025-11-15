@@ -5,7 +5,8 @@ import type { ChangeEvent, PropsWithChildren } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import type { FCWithDeps } from '../../container/utils';
 import { componentFactory, useDependencies } from '../../container/utils';
-import type { ServerData, ServersMap, ServerWithId } from '../data';
+import type { ServerData } from '../data';
+import { useServers } from '../reducers/servers';
 import type { ServersImporter } from '../services/ServersImporter';
 import { DuplicatedServersModal } from './DuplicatedServersModal';
 import { dedupServers, ensureUniqueIds } from './index';
@@ -17,24 +18,18 @@ export type ImportServersBtnProps = PropsWithChildren<{
   className?: string;
 }>;
 
-type ImportServersBtnConnectProps = ImportServersBtnProps & {
-  createServers: (servers: ServerWithId[]) => void;
-  servers: ServersMap;
-};
-
 type ImportServersBtnDeps = {
   ServersImporter: ServersImporter
 };
 
-const ImportServersBtn: FCWithDeps<ImportServersBtnConnectProps, ImportServersBtnDeps> = ({
-  createServers,
-  servers,
+const ImportServersBtn: FCWithDeps<ImportServersBtnProps, ImportServersBtnDeps> = ({
   children,
   onImport,
   onError = () => {},
   tooltipPlacement = 'bottom',
   className = '',
 }) => {
+  const { createServers, servers } = useServers();
   const { ServersImporter: serversImporter } = useDependencies(ImportServersBtn);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { anchor, tooltip } = useTooltip({ placement: tooltipPlacement });

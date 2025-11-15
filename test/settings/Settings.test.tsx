@@ -1,12 +1,12 @@
-import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { Settings } from '../../src/settings/Settings';
 import { checkAccessibility } from '../__helpers__/accessibility';
+import { renderWithStore } from '../__helpers__/setUpTest';
 
 describe('<Settings />', () => {
-  const setUp = () => render(
+  const setUp = () => renderWithStore(
     <MemoryRouter>
-      <Settings settings={{}} setSettings={vi.fn()} />
+      <Settings />
     </MemoryRouter>,
   );
 

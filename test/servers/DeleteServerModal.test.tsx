@@ -1,23 +1,23 @@
 import { screen } from '@testing-library/react';
 import { fromPartial } from '@total-typescript/shoehorn';
+import type { ServerWithId } from '../../src/servers/data';
 import { DeleteServerModal } from '../../src/servers/DeleteServerModal';
 import { checkAccessibility } from '../__helpers__/accessibility';
-import { renderWithEvents } from '../__helpers__/setUpTest';
+import { renderWithStore } from '../__helpers__/setUpTest';
 import { TestModalWrapper } from '../__helpers__/TestModalWrapper';
 
 describe('<DeleteServerModal />', () => {
-  const deleteServerMock = vi.fn();
   const serverName = 'the_server_name';
-  const setUp = () => renderWithEvents(
+  const server = fromPartial<ServerWithId>({ id: 'foo', name: serverName });
+  const setUp = () => renderWithStore(
     <TestModalWrapper
-      renderModal={(args) => (
-        <DeleteServerModal
-          {...args}
-          server={fromPartial({ name: serverName })}
-          deleteServer={deleteServerMock}
-        />
-      )}
+      renderModal={(args) => <DeleteServerModal {...args} server={server} />}
     />,
+    {
+      initialState: {
+        servers: { foo: server },
+      },
+    },
   );
 
   it('passes a11y checks', () => checkAccessibility(setUp()));
@@ -40,19 +40,21 @@ describe('<DeleteServerModal />', () => {
     [() => screen.getByRole('button', { name: 'Cancel' })],
     [() => screen.getByLabelText('Close dialog')],
   ])('closes dialog when clicking cancel button', async (getButton) => {
-    const { user } = setUp();
+    const { user, store } = setUp();
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     await user.click(getButton());
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(deleteServerMock).not.toHaveBeenCalled();
+
+    // No server has been deleted
+    expect(Object.keys(store.getState().servers)).toHaveLength(1);
   });
 
   it('deletes server when clicking accept button', async () => {
-    const { user } = setUp();
+    const { user, store } = setUp();
 
-    expect(deleteServerMock).not.toHaveBeenCalled();
+    expect(Object.keys(store.getState().servers)).toHaveLength(1);
     await user.click(screen.getByRole('button', { name: 'Delete' }));
-    expect(deleteServerMock).toHaveBeenCalledOnce();
+    expect(Object.keys(store.getState().servers)).toHaveLength(0);
   });
 });

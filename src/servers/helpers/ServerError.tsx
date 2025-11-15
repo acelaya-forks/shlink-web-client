@@ -2,24 +2,15 @@ import { Card, Message } from '@shlinkio/shlink-frontend-kit';
 import type { FC } from 'react';
 import { Link } from 'react-router';
 import { NoMenuLayout } from '../../common/NoMenuLayout';
-import type { FCWithDeps } from '../../container/utils';
-import { componentFactory, useDependencies } from '../../container/utils';
-import type { SelectedServer, ServersMap } from '../data';
 import { isServerWithId } from '../data';
-import type { DeleteServerButtonProps } from '../DeleteServerButton';
+import { DeleteServerButton } from '../DeleteServerButton';
+import { useSelectedServer } from '../reducers/selectedServer';
+import { useServers } from '../reducers/servers';
 import { ServersListGroup } from '../ServersListGroup';
 
-type ServerErrorProps = {
-  servers: ServersMap;
-  selectedServer: SelectedServer;
-};
-
-type ServerErrorDeps = {
-  DeleteServerButton: FC<DeleteServerButtonProps>;
-};
-
-const ServerError: FCWithDeps<ServerErrorProps, ServerErrorDeps> = ({ servers, selectedServer }) => {
-  const { DeleteServerButton } = useDependencies(ServerError);
+export const ServerError: FC = () => {
+  const { servers } = useServers();
+  const { selectedServer } = useSelectedServer();
 
   return (
     <NoMenuLayout>
@@ -54,5 +45,3 @@ const ServerError: FCWithDeps<ServerErrorProps, ServerErrorDeps> = ({ servers, s
     </NoMenuLayout>
   );
 };
-
-export const ServerErrorFactory = componentFactory(ServerError, ['DeleteServerButton']);

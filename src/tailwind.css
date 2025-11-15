@@ -8,7 +8,5 @@
     :root {
         --footer-height: 2.3rem;
         --footer-margin: .8rem;
-        /* FIXME Remove this once updated to shlink-web-component 0.15.1 */
-        --header-height: 52px;
     }
 }

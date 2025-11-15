@@ -26,7 +26,7 @@ export const DuplicatedServersModal: FC<DuplicatedServersModalProps> = (
       cancelText={hasMultipleServers ? 'Ignore duplicates' : 'Discard'}
     >
       <p>{hasMultipleServers ? 'The next servers already exist:' : 'There is already a server with:'}</p>
-      <ul className="list-disc mt-4">
+      <ul className="list-disc my-4 pl-5">
         {duplicatedServers.map(({ url, apiKey }, index) => (!hasMultipleServers ? (
           <Fragment key={index}>
             <li>URL: <b>{url}</b></li>
